@@ -1,14 +1,16 @@
 import { useFonts } from 'expo-font'
 import * as SplashScreen from 'expo-splash-screen'
-import { useContext, useEffect } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import 'react-native-reanimated'
 import '../global.css'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { Drawer } from 'expo-router/drawer'
 import CustomDrawerContent from '@/components/CustomDrawerContent'
-import { Pressable, StatusBar, Text, TouchableOpacity, View } from 'react-native'
+import { Pressable, StatusBar, View } from 'react-native'
 import Svg, { Path } from 'react-native-svg'
 import { GlobalContext, GlobalProvider } from '@/store/StoreContext'
+import UserMenu from '@/components/UserMenu'
+import { EventProvider } from 'react-native-outside-press'
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync()
@@ -29,65 +31,74 @@ export default function RootLayout() {
   }
 
   return (
-    <GlobalProvider>
-      <GestureHandlerRootView style={{ flex: 1 }}>
-        <StatusBar backgroundColor='#8B4513' barStyle='light-content' />
-        <Drawer
-          drawerContent={CustomDrawerContent}
-          screenOptions={{
-            drawerActiveTintColor: '#FFFFFF',
-            drawerInactiveTintColor: '#FFFFFF',
-            headerStyle: {
-              backgroundColor: '#8B4513',
-            },
-            headerTintColor: '#ffffff',
-            headerTitle: () => <CatSvg />,
-            headerRight: () => <SignInButton />,
-          }}
-        >
-          <Drawer.Screen
-            name='index'
-            options={{
-              drawerLabel: 'Home',
-              title: '',
-              headerTitleAlign: 'center',
+    <EventProvider>
+      <GlobalProvider>
+        <GestureHandlerRootView style={{ flex: 1 }}>
+          <StatusBar backgroundColor='#8B4513' barStyle='light-content' />
+          <Drawer
+            drawerContent={CustomDrawerContent}
+            screenOptions={{
+              drawerActiveTintColor: '#FFFFFF',
+              drawerInactiveTintColor: '#FFFFFF',
+              headerStyle: {
+                backgroundColor: '#8B4513',
+              },
+              headerTintColor: '#ffffff',
+              headerTitle: () => <CatSvg />,
+              headerRight: () => <SignInButton />,
             }}
-          />
-          <Drawer.Screen
-            name='categories'
-            options={{
-              drawerLabel: 'Categories',
-              title: '',
-              headerTitleAlign: 'center',
-            }}
-          />
-          <Drawer.Screen
-            name='history'
-            options={{
-              drawerLabel: 'History',
-              title: '',
-              headerTitleAlign: 'center',
-            }}
-          />
-          <Drawer.Screen
-            name='chats'
-            options={{
-              drawerLabel: 'Chats',
-              title: '',
-              headerTitleAlign: 'center',
-            }}
-          />
-          <Drawer.Screen
-            name='about'
-            options={{
-              drawerLabel: 'About Us',
-              title: '',
-              headerTitleAlign: 'center',
-            }}
-          />
-        </Drawer>
-      </GestureHandlerRootView>
-    </GlobalProvider>
+          >
+            <Drawer.Screen
+              name='index'
+              options={{
+                drawerLabel: 'Home',
+                title: '',
+                headerTitleAlign: 'center',
+              }}
+            />
+            <Drawer.Screen
+              name='categories'
+              options={{
+                drawerLabel: 'Categories',
+                title: '',
+                headerTitleAlign: 'center',
+              }}
+            />
+            <Drawer.Screen
+              name='history'
+              options={{
+                drawerLabel: 'History',
+                title: '',
+                headerTitleAlign: 'center',
+              }}
+            />
+            <Drawer.Screen
+              name='chats'
+              options={{
+                drawerLabel: 'Chats',
+                title: '',
+                headerTitleAlign: 'center',
+              }}
+            />
+            <Drawer.Screen
+              name='about'
+              options={{
+                drawerLabel: 'About Us',
+                title: '',
+                headerTitleAlign: 'center',
+              }}
+            />
+            <Drawer.Screen
+              name='profile'
+              options={{
+                drawerItemStyle: { display: 'none' }, // Hide this option
+                headerTitleAlign: 'center',
+              }}
+            />
+          </Drawer>
+        </GestureHandlerRootView>
+      </GlobalProvider>
+    </EventProvider>
   )
 }
 
@@ -117,11 +128,14 @@ function CatSvg() {
 
 function SignInButton() {
   const { setOpenModalSignIn } = useContext(GlobalContext)
+  const [showMenu, setShowMenu] = useState(false)
+  const [isSignIn, setIsSignIn] = useState(true)
 
   return (
     <Pressable
       onPress={() => {
-        setOpenModalSignIn(true)
+        if (!isSignIn) setOpenModalSignIn(true)
+        else setShowMenu(!showMenu)
       }}
     >
       <View className='mx-[12px] bg-transparent'>
@@ -135,6 +149,12 @@ function SignInButton() {
           />
         </Svg>
       </View>
+      <UserMenu
+        showMenu={showMenu}
+        closeMenu={() => {
+          setShowMenu(false)
+        }}
+      />
     </Pressable>
   )
 }
