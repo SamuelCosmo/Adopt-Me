@@ -11,6 +11,14 @@ interface FormProps {
   changeForm: () => void
 }
 
+interface PasswordProps {
+  placeholder: string
+  passwordValue: string
+  setPasswordValue: (value: string) => void
+  showPassword: boolean
+  setShowPassword: (value: boolean) => void
+}
+
 const windowWidth = Dimensions.get('window').width
 const windowHeight = Dimensions.get('window').height
 
@@ -75,6 +83,7 @@ function CatSvg() {
 function SignInForm({ changeForm }: FormProps) {
   const [username, setUsername] = useState<string>('')
   const [password, setPassword] = useState<string>('')
+  const [showPassword, setShowPassword] = useState<boolean>(false)
 
   return (
     <View style={stylesModal.body}>
@@ -86,17 +95,65 @@ function SignInForm({ changeForm }: FormProps) {
         value={username}
         onChangeText={setUsername}
       />
-      <TextInput
-        style={stylesModal.input}
+      <PasswordInput
         placeholder='Password'
-        placeholderTextColor='#7c7c7c'
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
+        passwordValue={password}
+        setPasswordValue={setPassword}
+        showPassword={showPassword}
+        setShowPassword={setShowPassword}
       />
       <View className='flex flex-column gap-[8px]'>
         <Pressable style={stylesModal.button} onPress={() => {}}>
           <Text className='text-white'>Sign In</Text>
+        </Pressable>
+      </View>
+      <View className='w-full h-[1px] bg-gray-200 mt-[4px] mb-[4px]'></View>
+      <Pressable
+        style={stylesModal.button_cancel}
+        onPress={() => {
+          changeForm()
+        }}
+      >
+        <Text style={stylesModal.button_text}>Sign Up</Text>
+      </Pressable>
+    </View>
+  )
+}
+
+function SignUpForm({ changeForm }: FormProps) {
+  const [username, setUsername] = useState<string>('')
+  const [password, setPassword] = useState<string>('')
+  const [showPassword, setShowPassword] = useState<boolean>(false)
+  const [repeatedPassword, setRepeatedPassword] = useState<string>('')
+  const [showRepeatedPassword, setShowRepeatedPassword] = useState<boolean>(false)
+
+  return (
+    <View style={stylesModal.body}>
+      <CatSvg />
+      <TextInput
+        style={stylesModal.input}
+        placeholder='New Username'
+        placeholderTextColor='#7c7c7c'
+        value={username}
+        onChangeText={setUsername}
+      />
+      <PasswordInput
+        placeholder='New Password'
+        passwordValue={password}
+        setPasswordValue={setPassword}
+        showPassword={showPassword}
+        setShowPassword={setShowPassword}
+      />
+      <PasswordInput
+        placeholder='Repeated Password'
+        passwordValue={repeatedPassword}
+        setPasswordValue={setRepeatedPassword}
+        showPassword={showRepeatedPassword}
+        setShowPassword={setShowRepeatedPassword}
+      />
+      <View className='flex flex-column gap-[8px]'>
+        <Pressable style={stylesModal.button} onPress={() => {}}>
+          <Text className='text-white'>Sign Up</Text>
         </Pressable>
       </View>
       <View className='w-full h-[1px] bg-gray-200 mt-[4px] mb-[4px]'></View>
@@ -112,50 +169,49 @@ function SignInForm({ changeForm }: FormProps) {
   )
 }
 
-function SignUpForm({ changeForm }: FormProps) {
-  const [username, setUsername] = useState<string>('')
-  const [password, setPassword] = useState<string>('')
-  const [repeatedPassword, setRepeatedPassword] = useState<string>('')
-
+function PasswordInput({ placeholder, passwordValue, setPasswordValue, showPassword, setShowPassword }: PasswordProps) {
   return (
-    <View style={stylesModal.body}>
-      <CatSvg />
+    <View
+      style={{
+        ...stylesModal.input,
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'flex-start',
+        alignItems: 'center',
+      }}
+    >
       <TextInput
-        style={stylesModal.input}
-        placeholder='New Username'
+        placeholder={placeholder}
         placeholderTextColor='#7c7c7c'
-        value={username}
-        onChangeText={setUsername}
+        value={passwordValue}
+        onChangeText={setPasswordValue}
+        secureTextEntry={!showPassword}
+        className='flex-1'
       />
-      <TextInput
-        style={stylesModal.input}
-        placeholder='New Password'
-        placeholderTextColor='#7c7c7c'
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-      />
-      <TextInput
-        style={stylesModal.input}
-        placeholder='Repeat Password'
-        placeholderTextColor='#7c7c7c'
-        value={repeatedPassword}
-        onChangeText={setRepeatedPassword}
-        secureTextEntry
-      />
-      <View className='flex flex-column gap-[8px]'>
-        <Pressable style={stylesModal.button} onPress={() => {}}>
-          <Text className='text-white'>Sign Up</Text>
-        </Pressable>
-      </View>
-      <View className='w-full h-[1px] bg-gray-200 mt-[4px] mb-[4px]'></View>
       <Pressable
-        style={stylesModal.button_cancel}
         onPress={() => {
-          changeForm()
+          setShowPassword(!showPassword)
         }}
+        style={{ position: 'absolute', right: 8 }}
       >
-        <Text style={stylesModal.button_text}>Sign In</Text>
+        {!showPassword ? (
+          <Svg width='24px' height='24px' viewBox='0 0 24 24' fill='none'>
+            <Path
+              fillRule='evenodd'
+              clipRule='evenodd'
+              d='M19.707 5.707a1 1 0 00-1.414-1.414l-4.261 4.26a4 4 0 00-5.478 5.478l-4.261 4.262a1 1 0 101.414 1.414l4.261-4.26a4 4 0 005.478-5.478l4.261-4.262zm-7.189 4.36a2 2 0 00-2.45 2.45l2.45-2.45zm-1.036 3.865l2.45-2.45a2 2 0 01-2.45 2.45zm4.283-9.111C14.63 4.32 13.367 4 12 4 9.148 4 6.757 5.395 4.998 6.906c-1.765 1.517-2.99 3.232-3.534 4.064a1.876 1.876 0 000 2.06 20.304 20.304 0 002.748 3.344l1.414-1.414A18.315 18.315 0 013.18 12c.51-.773 1.598-2.268 3.121-3.577C7.874 7.072 9.816 6 12 6a7.06 7.06 0 012.22.367l1.545-1.546zM12 18a7.06 7.06 0 01-2.22-.367L8.236 19.18c1.136.5 2.398.821 3.765.821 2.852 0 5.243-1.395 7.002-2.906 1.765-1.517 2.99-3.232 3.534-4.064.411-.628.411-1.431 0-2.06a20.303 20.303 0 00-2.748-3.344L18.374 9.04A18.312 18.312 0 0120.82 12c-.51.773-1.598 2.268-3.121 3.577C16.126 16.928 14.184 18 12 18z'
+              fill='#ccc'
+            />
+          </Svg>
+        ) : (
+          <Svg width='24px' height='24px' viewBox='0 0 20 20' fill='none'>
+            <Path
+              fill='#ccc'
+              fillRule='evenodd'
+              d='M3.415 10.242c-.067-.086-.13-.167-.186-.242a16.806 16.806 0 011.803-2.025C6.429 6.648 8.187 5.5 10 5.5c1.813 0 3.57 1.148 4.968 2.475A16.816 16.816 0 0116.771 10a16.9 16.9 0 01-1.803 2.025C13.57 13.352 11.813 14.5 10 14.5c-1.813 0-3.57-1.148-4.968-2.475a16.799 16.799 0 01-1.617-1.783zm15.423-.788L18 10l.838.546-.002.003-.003.004-.01.016-.037.054a17.123 17.123 0 01-.628.854 18.805 18.805 0 01-1.812 1.998C14.848 14.898 12.606 16.5 10 16.5s-4.848-1.602-6.346-3.025a18.806 18.806 0 01-2.44-2.852 6.01 6.01 0 01-.037-.054l-.01-.016-.003-.004-.001-.002c0-.001-.001-.001.837-.547l-.838-.546.002-.003.003-.004.01-.016a6.84 6.84 0 01.17-.245 18.804 18.804 0 012.308-2.66C5.151 5.1 7.394 3.499 10 3.499s4.848 1.602 6.346 3.025a18.803 18.803 0 012.44 2.852l.037.054.01.016.003.004.001.002zM18 10l.838-.546.355.546-.355.546L18 10zM1.162 9.454L2 10l-.838.546L.807 10l.355-.546zM9 10a1 1 0 112 0 1 1 0 01-2 0zm1-3a3 3 0 100 6 3 3 0 000-6z'
+            />
+          </Svg>
+        )}
       </Pressable>
     </View>
   )
@@ -194,6 +250,7 @@ const stylesModal = StyleSheet.create({
     paddingHorizontal: 8,
     marginBottom: 12,
     color: 'black',
+    position: 'relative',
   },
   button: {
     display: 'flex',
