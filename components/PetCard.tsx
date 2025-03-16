@@ -18,24 +18,41 @@ const location = (
 interface Props {
   petToShow: PetsProps
   onClick: () => void
+  orientation?: 'row' | 'column'
 }
 
-export default function PetCard({ petToShow, onClick }: Props) {
+export default function PetCard({ petToShow, onClick, orientation = 'column' }: Props) {
   // const isRemote = srcImage.startsWith('http') || srcImage.startsWith('https')
 
   return (
-    <View style={styles.card}>
+    <View
+      style={styles.card}
+      className={orientation === 'column' ? 'flex flex-col rounded-lg' : 'flex items-center flex-row rounded-lg'}
+    >
       <Pressable onPress={onClick} className='absolute top-0 left-0 w-full h-full z-10'></Pressable>
-      <Image source={petToShow.srcImage} style={{ height: 150 }} className='rounded-tl-lg rounded-tr-lg w-full' />
-      <View className='p-0 pr-[8px] pb-[8px] pl-[8px]'>
-        <Text className='text-xl font-extrabold' style={{ color: '#8B4513' }} numberOfLines={1} ellipsizeMode='tail'>
+      <Image
+        source={petToShow.srcImage}
+        style={{ height: orientation === 'column' ? 150 : 120 }}
+        className={
+          orientation === 'column' ? 'rounded-tl-lg rounded-tr-lg w-full' : 'rounded-tl-lg rounded-bl-lg w-1/4'
+        }
+      />
+      <View className={orientation === 'column' ? 'p-0 pr-[8px] pb-[8px] pl-[8px]' : 'pt-[4px] pb-[4px] w-4/6'}>
+        <Text
+          className={orientation === 'column' ? 'text-xl font-extrabold' : 'font-extrabold'}
+          style={{ color: '#8B4513' }}
+          numberOfLines={1}
+          ellipsizeMode='tail'
+        >
           {petToShow.name}
         </Text>
         <Text className='text-base' numberOfLines={2} ellipsizeMode='tail'>
           {petToShow.description}
         </Text>
         <View className='flex flex-row w-full justify-between mt-[16px]'>
-          <Text className='font-extrabold' style={{ color: '#8B4513' }}>Age: {petToShow.age}</Text>
+          <Text className='font-extrabold' style={{ color: '#8B4513' }}>
+            Age: {petToShow.age}
+          </Text>
           <Text className='text-[12px] font-extrabold text-right' style={{ color: '#8B4513' }}>
             {location} {petToShow.city}, {petToShow.state}
           </Text>
@@ -47,9 +64,7 @@ export default function PetCard({ petToShow, onClick }: Props) {
 
 const styles = StyleSheet.create({
   card: {
-    flexDirection: 'column',
     gap: 8,
-    borderRadius: 12,
     backgroundColor: '#ffffff',
     elevation: 12,
     shadowColor: '#8B4513',
