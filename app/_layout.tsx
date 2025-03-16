@@ -102,6 +102,13 @@ export default function RootLayout() {
                 headerTitleAlign: 'center',
               }}
             />
+            <Drawer.Screen
+              name='publish_comment'
+              options={{
+                drawerItemStyle: { display: 'none' },
+                headerTitleAlign: 'center',
+              }}
+            />
           </Drawer>
         </GestureHandlerRootView>
       </GlobalProvider>

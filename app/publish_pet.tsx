@@ -2,6 +2,7 @@ import { StyleSheet, View, Text, ScrollView, Image, FlatList, Dimensions, TextIn
 import * as ImagePicker from 'expo-image-picker'
 import { useState } from 'react'
 import AddButton from '@/components/AddButton'
+import { useRouter } from 'expo-router'
 
 const windowWidth = Dimensions.get('window').width
 const windowHeight = Dimensions.get('window').height
@@ -10,6 +11,7 @@ export default function PublishPet() {
   const [perName, setPetName] = useState<string>('')
   const [description, setDescription] = useState<string>('')
   const [images, setImages] = useState<string[]>([])
+  const router = useRouter()
 
   const pickImages = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync()
@@ -91,10 +93,12 @@ export default function PublishPet() {
         />
       )}
       <Pressable
-        onPress={() => {}}
+        onPress={() => {
+          router.push('/')
+        }}
         style={{ backgroundColor: '#00639c', padding: 16, borderRadius: 8, marginTop: 16, alignItems: 'center' }}
       >
-        <Text className='text-white font-bold'>Publish Pet</Text>
+        <Text className='text-white font-bold'>Submit</Text>
       </Pressable>
     </ScrollView>
   )

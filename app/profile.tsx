@@ -20,6 +20,7 @@ import { GridIcon, ListIcon } from '@/assets/svg/gridList'
 import CommentCard from '@/components/CommentCard'
 import { ScrollView } from 'react-native-gesture-handler'
 import AddButton from '@/components/AddButton'
+import { useRouter } from 'expo-router'
 const catImage = require('../assets/images/cat.jpg')
 const dogImage = require('../assets/images/dog.webp')
 
@@ -179,6 +180,7 @@ export default function Profile() {
   const [petToShow, setPetToShow] = useState<PetsProps>(defaultPet)
   const layout = useWindowDimensions()
   const [index, setIndex] = useState(0)
+  const router = useRouter()
   const [routes] = useState([
     { key: 'first', title: 'Pets' },
     { key: 'second', title: 'Comments' },
@@ -199,7 +201,13 @@ export default function Profile() {
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>
         <View style={{ flex: 1, width: '100%' }}>
-          {index === 1 && <AddButton />}
+          {index === 1 && (
+            <AddButton
+              onClick={() => {
+                router.push('/publish_comment')
+              }}
+            />
+          )}
           <ModalPets
             openModal={openModal}
             setOpenModal={(value: boolean) => {
