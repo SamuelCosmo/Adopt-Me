@@ -9,3 +9,10 @@ export interface PetsProps {
   city: string
   state: string
 }
+
+export interface CommentsProps {
+  id: string
+  commentatorName: string
+  score: number
+  comment: string
+}
