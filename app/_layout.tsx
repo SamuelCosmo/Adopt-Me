@@ -91,7 +91,14 @@ export default function RootLayout() {
             <Drawer.Screen
               name='profile'
               options={{
-                drawerItemStyle: { display: 'none' }, // Hide this option
+                drawerItemStyle: { display: 'none' },
+                headerTitleAlign: 'center',
+              }}
+            />
+            <Drawer.Screen
+              name='publish_pet'
+              options={{
+                drawerItemStyle: { display: 'none' },
                 headerTitleAlign: 'center',
               }}
             />

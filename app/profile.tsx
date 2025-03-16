@@ -19,6 +19,7 @@ import ModalPets from '@/components/ModalPets'
 import { GridIcon, ListIcon } from '@/assets/svg/gridList'
 import CommentCard from '@/components/CommentCard'
 import { ScrollView } from 'react-native-gesture-handler'
+import AddButton from '@/components/AddButton'
 const catImage = require('../assets/images/cat.jpg')
 const dogImage = require('../assets/images/dog.webp')
 
@@ -73,68 +74,66 @@ const FirstRoute = ({ setOpenModal, setPetToShow }: FirstRouteProps) => {
   const [gridList, setGridList] = useState<boolean>(false)
 
   return (
-    <ScrollView>
-      <View style={[styles.scene, {}]}>
-        <Pressable onPress={() => setGridList(!gridList)}>
-          <View className='w-full flex flex-row justify-end items-center pt-[16px] pb-[16px] pr-[16px] gap-[8px]'>
-            <View
-              className='flex flex-row items-center justify-center gap-[8px] p-[8px] rounded-lg'
-              style={{ backgroundColor: '#cdd2d3' }}
-            >
-              <GridIcon width='24px' height='24px' color='#7c7c7c' />
-              <ListIcon width='28px' height='28px' color='#7c7c7c' />
-            </View>
+    <View style={[styles.scene, {}]}>
+      <Pressable onPress={() => setGridList(!gridList)}>
+        <View className='w-full flex flex-row justify-end items-center pt-[16px] pb-[16px] pr-[16px] gap-[8px]'>
+          <View
+            className='flex flex-row items-center justify-center gap-[8px] p-[8px] rounded-lg'
+            style={{ backgroundColor: '#cdd2d3' }}
+          >
+            <GridIcon width='24px' height='24px' color='#7c7c7c' />
+            <ListIcon width='28px' height='28px' color='#7c7c7c' />
           </View>
-        </Pressable>
-        {gridList && (
-          <FlatList
-            data={data}
-            keyExtractor={(item) => item.id}
-            numColumns={2}
-            renderItem={({ item }) => (
-              <View style={{ ...styles.card_container, width: windowWidth / 2 - 32 }}>
-                <PetCard
-                  petToShow={item}
-                  onClick={() => {
-                    setOpenModal(true)
-                    setPetToShow(item)
-                  }}
-                  orientation={'column'}
-                />
-              </View>
-            )}
-            columnWrapperStyle={styles.row}
-            contentContainerStyle={styles.gridContainer}
-          />
-        )}
-        {!gridList && (
-          <FlatList
-            data={data}
-            keyExtractor={(item) => item.id}
-            numColumns={1}
-            renderItem={({ item }) => (
-              <View style={{ ...styles.card_container, width: '100%' }}>
-                <PetCard
-                  petToShow={item}
-                  onClick={() => {
-                    setOpenModal(true)
-                    setPetToShow(item)
-                  }}
-                  orientation={'row'}
-                />
-              </View>
-            )}
-            contentContainerStyle={styles.gridContainer}
-          />
-        )}
-      </View>
-    </ScrollView>
+        </View>
+      </Pressable>
+      {gridList && (
+        <FlatList
+          data={data}
+          keyExtractor={(item) => item.id}
+          numColumns={2}
+          renderItem={({ item }) => (
+            <View style={{ ...styles.card_container, width: windowWidth / 2 - 32 }}>
+              <PetCard
+                petToShow={item}
+                onClick={() => {
+                  setOpenModal(true)
+                  setPetToShow(item)
+                }}
+                orientation={'column'}
+              />
+            </View>
+          )}
+          columnWrapperStyle={styles.row}
+          contentContainerStyle={styles.gridContainer}
+        />
+      )}
+      {!gridList && (
+        <FlatList
+          data={data}
+          keyExtractor={(item) => item.id}
+          numColumns={1}
+          renderItem={({ item }) => (
+            <View style={{ ...styles.card_container, width: '100%' }}>
+              <PetCard
+                petToShow={item}
+                onClick={() => {
+                  setOpenModal(true)
+                  setPetToShow(item)
+                }}
+                orientation={'row'}
+              />
+            </View>
+          )}
+          contentContainerStyle={styles.gridContainer}
+        />
+      )}
+    </View>
   )
 }
 
 const SecondRoute = () => (
   <ScrollView>
-    <View style={[styles.scene, {}]} className='flex flex-col p-[16px] gap-[16px]'>
+    <View style={[styles.scene, { position: 'relative' }]} className='flex flex-col p-[16px] pb-[96px] gap-[16px]'>
       <CommentCard
         data={{
           id: '1',
@@ -200,6 +199,7 @@ export default function Profile() {
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>
         <View style={{ flex: 1, width: '100%' }}>
+          {index === 1 && <AddButton />}
           <ModalPets
             openModal={openModal}
             setOpenModal={(value: boolean) => {

@@ -1,8 +1,10 @@
+import AddButton from '@/components/AddButton'
 import ModalPets from '@/components/ModalPets'
 import ModalSignIn from '@/components/ModalSignIn'
 import PetCard from '@/components/PetCard'
 import { GlobalContext } from '@/store/StoreContext'
 import { PetsProps } from '@/utils/interfaces'
+import { useRouter } from 'expo-router'
 import { useContext, useState } from 'react'
 import { StyleSheet, View, FlatList, Dimensions } from 'react-native'
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context'
@@ -55,10 +57,16 @@ export default function HomeScreen() {
   const [petToShow, setPetToShow] = useState<PetsProps>(defaultPet)
 
   const { openModalSignIn, setOpenModalSignIn } = useContext(GlobalContext)
+  const router = useRouter()
 
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>
+        <AddButton
+          onClick={() => {
+            router.push('/publish_pet')
+          }}
+        />
         <ModalSignIn
           openModal={openModalSignIn}
           setOpenModal={(value: boolean) => {
@@ -102,6 +110,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     // paddingTop: StatusBar.currentHeight,
     paddingVertical: 16,
+    paddingBottom: 96,
   },
   gridContainer: {
     gap: 16,
