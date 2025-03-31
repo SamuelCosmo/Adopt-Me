@@ -2,6 +2,9 @@ import { useRouter } from 'expo-router'
 import React from 'react'
 import { StyleSheet, Pressable, View, Text } from 'react-native'
 import OutsidePressHandler from 'react-native-outside-press'
+import { signOutUser } from '@/store/slices/authSlice'
+import { useDispatch } from 'react-redux'
+import { AppDispatch } from '@/store/StoreContext'
 
 interface UserMenuProps {
   showMenu: boolean
@@ -9,6 +12,7 @@ interface UserMenuProps {
 }
 
 export default function UserMenu({ showMenu, closeMenu }: UserMenuProps) {
+  const dispatch = useDispatch<AppDispatch>()
   const router = useRouter()
 
   return (
@@ -30,9 +34,10 @@ export default function UserMenu({ showMenu, closeMenu }: UserMenuProps) {
           </Pressable>
           <View style={styles.divider} />
           <Pressable
-            onPress={() => {
+            onPress={async () => {
               closeMenu()
-              alert('Option 2 clicked')
+              await dispatch(signOutUser())
+              router.push('/')
             }}
             style={styles.button}
           >

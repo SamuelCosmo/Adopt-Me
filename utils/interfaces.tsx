@@ -1,3 +1,10 @@
+export interface User {
+  name: string
+  email: string
+  password: string
+  token: string
+}
+
 export interface PetsProps {
   id: string
   srcImage: any

@@ -1,6 +1,6 @@
 import { useFonts } from 'expo-font'
 import * as SplashScreen from 'expo-splash-screen'
-import { useContext, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import 'react-native-reanimated'
 import '../global.css'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
@@ -8,9 +8,11 @@ import { Drawer } from 'expo-router/drawer'
 import CustomDrawerContent from '@/components/CustomDrawerContent'
 import { Pressable, StatusBar, View } from 'react-native'
 import Svg, { Path } from 'react-native-svg'
-import { GlobalContext, GlobalProvider } from '@/store/StoreContext'
+import { store } from '@/store/StoreContext'
 import UserMenu from '@/components/UserMenu'
 import { EventProvider } from 'react-native-outside-press'
+import { Provider, useDispatch, useSelector } from 'react-redux'
+import { setOpenModalSignIn } from '@/store/slices/modalSignInSlice'
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync()
@@ -22,9 +24,13 @@ export default function RootLayout() {
 
   useEffect(() => {
     if (loaded) {
-      SplashScreen.hideAsync()
+      try {
+        SplashScreen.hideAsync();
+      } catch (error) {
+        console.error('Error hiding splash screen:', error);
+      }
     }
-  }, [loaded])
+  }, [loaded]);
 
   if (!loaded) {
     return null
@@ -32,7 +38,7 @@ export default function RootLayout() {
 
   return (
     <EventProvider>
-      <GlobalProvider>
+      <Provider store={store}>
         <GestureHandlerRootView style={{ flex: 1 }}>
           <StatusBar backgroundColor='#8B4513' barStyle='light-content' />
           <Drawer
@@ -111,7 +117,7 @@ export default function RootLayout() {
             />
           </Drawer>
         </GestureHandlerRootView>
-      </GlobalProvider>
+      </Provider>
     </EventProvider>
   )
 }
@@ -141,14 +147,19 @@ function CatSvg() {
 }
 
 function SignInButton() {
-  const { setOpenModalSignIn } = useContext(GlobalContext)
+  const dispatch = useDispatch()
+  const token = useSelector((state: any) => state.auth.user.token)
   const [showMenu, setShowMenu] = useState(false)
-  const [isSignIn, setIsSignIn] = useState(true)
+  const [isSignIn, setIsSignIn] = useState(!!token)
+
+  useEffect(() => {
+    setIsSignIn(!!token)
+  }, [token])
 
   return (
     <Pressable
       onPress={() => {
-        if (!isSignIn) setOpenModalSignIn(true)
+        if (!isSignIn) dispatch(setOpenModalSignIn(true))
         else setShowMenu(!showMenu)
       }}
     >

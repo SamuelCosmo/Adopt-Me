@@ -1,6 +1,9 @@
 import { useState } from 'react'
-import { Image, StyleSheet, Text, View, Modal, Pressable, Dimensions, Button, TextInput } from 'react-native'
+import { StyleSheet, Text, View, Modal, Pressable, Dimensions, TextInput } from 'react-native'
 import Svg, { Path } from 'react-native-svg'
+import { useDispatch } from 'react-redux'
+import { loginUser, signUpUser } from '@/store/slices/authSlice'
+import { AppDispatch } from '@/store/StoreContext'
 
 interface Props {
   openModal: boolean
@@ -24,6 +27,7 @@ const windowHeight = Dimensions.get('window').height
 
 export default function ModalSignIn({ openModal, setOpenModal }: Props) {
   const [isSignIn, setIsSignIn] = useState<boolean>(true)
+
   return (
     <Modal
       animationType='slide'
@@ -81,7 +85,8 @@ function CatSvg() {
 }
 
 function SignInForm({ changeForm }: FormProps) {
-  const [username, setUsername] = useState<string>('')
+  const dispatch = useDispatch<AppDispatch>()
+  const [email, setEmail] = useState<string>('')
   const [password, setPassword] = useState<string>('')
   const [showPassword, setShowPassword] = useState<boolean>(false)
 
@@ -90,10 +95,10 @@ function SignInForm({ changeForm }: FormProps) {
       <CatSvg />
       <TextInput
         style={stylesModal.input}
-        placeholder='Username'
+        placeholder='Email'
         placeholderTextColor='#7c7c7c'
-        value={username}
-        onChangeText={setUsername}
+        value={email}
+        onChangeText={setEmail}
       />
       <PasswordInput
         placeholder='Password'
@@ -103,7 +108,12 @@ function SignInForm({ changeForm }: FormProps) {
         setShowPassword={setShowPassword}
       />
       <View className='flex flex-column gap-[8px]'>
-        <Pressable style={stylesModal.button} onPress={() => {}}>
+        <Pressable
+          style={stylesModal.button}
+          onPress={async () => {
+            await dispatch(loginUser({ email: email, password: password }))
+          }}
+        >
           <Text className='text-white'>Sign In</Text>
         </Pressable>
       </View>
@@ -121,7 +131,9 @@ function SignInForm({ changeForm }: FormProps) {
 }
 
 function SignUpForm({ changeForm }: FormProps) {
+  const dispatch = useDispatch<AppDispatch>()
   const [username, setUsername] = useState<string>('')
+  const [email, setEmail] = useState<string>('')
   const [password, setPassword] = useState<string>('')
   const [showPassword, setShowPassword] = useState<boolean>(false)
   const [repeatedPassword, setRepeatedPassword] = useState<string>('')
@@ -136,6 +148,13 @@ function SignUpForm({ changeForm }: FormProps) {
         placeholderTextColor='#7c7c7c'
         value={username}
         onChangeText={setUsername}
+      />
+      <TextInput
+        style={stylesModal.input}
+        placeholder='Email'
+        placeholderTextColor='#7c7c7c'
+        value={email}
+        onChangeText={setEmail}
       />
       <PasswordInput
         placeholder='New Password'
@@ -152,7 +171,14 @@ function SignUpForm({ changeForm }: FormProps) {
         setShowPassword={setShowRepeatedPassword}
       />
       <View className='flex flex-column gap-[8px]'>
-        <Pressable style={stylesModal.button} onPress={() => {}}>
+        <Pressable
+          style={stylesModal.button}
+          onPress={async () => {
+            if (username !== '' && email !== '' && password !== '' && password === repeatedPassword)
+              await dispatch(signUpUser({ name: username, email: email, password: password }))
+            else alert('Invalid data...')
+          }}
+        >
           <Text className='text-white'>Sign Up</Text>
         </Pressable>
       </View>

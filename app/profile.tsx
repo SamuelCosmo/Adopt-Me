@@ -21,6 +21,7 @@ import CommentCard from '@/components/CommentCard'
 import { ScrollView } from 'react-native-gesture-handler'
 import AddButton from '@/components/AddButton'
 import { useRouter } from 'expo-router'
+import CatFootPrint from '@/assets/svg/catFootPrint'
 const catImage = require('../assets/images/cat.jpg')
 const dogImage = require('../assets/images/dog.webp')
 
@@ -76,6 +77,12 @@ const FirstRoute = ({ setOpenModal, setPetToShow }: FirstRouteProps) => {
 
   return (
     <View style={[styles.scene, {}]}>
+      <View
+        className='flex justify-center items-center'
+        style={{ flex: 1, position: 'absolute', top: 0, left: 0, height: '100%', width: '100%' }}
+      >
+        <CatFootPrint color='#8B4513' width={320} height={320} />
+      </View>
       <Pressable onPress={() => setGridList(!gridList)}>
         <View className='w-full flex flex-row justify-end items-center pt-[16px] pb-[16px] pr-[16px] gap-[8px]'>
           <View
@@ -133,46 +140,54 @@ const FirstRoute = ({ setOpenModal, setPetToShow }: FirstRouteProps) => {
 }
 
 const SecondRoute = () => (
-  <ScrollView>
-    <View style={[styles.scene, { position: 'relative' }]} className='flex flex-col p-[16px] pb-[96px] gap-[16px]'>
-      <CommentCard
-        data={{
-          id: '1',
-          commentatorName: 'Ernesto Lopez',
-          score: 3,
-          comment:
-            'Buena experiencia, pero faltó más información sobre los cuidados y la comunicación pudo ser más rápida. Agradezco la adopción.',
-        }}
-      />
-      <CommentCard
-        data={{
-          id: '2',
-          commentatorName: 'Alejandro Perez',
-          score: 5,
-          comment:
-            'Excelente experiencia. La persona fue muy amable, brindó toda la información necesaria y se notaba su amor por los animales. ¡Gracias por la adopción!',
-        }}
-      />
-      <CommentCard
-        data={{
-          id: '3',
-          commentatorName: 'Ernesto Lopez',
-          score: 4,
-          comment:
-            'Buena experiencia, pero faltó más información sobre los cuidados y la comunicación pudo ser más rápida. Agradezco la adopción.',
-        }}
-      />
-      <CommentCard
-        data={{
-          id: '4',
-          commentatorName: 'Alejandro Perez',
-          score: 5,
-          comment:
-            'Excelente experiencia. La persona fue muy amable, brindó toda la información necesaria y se notaba su amor por los animales. ¡Gracias por la adopción!',
-        }}
-      />
+  <View>
+    <View
+      className='flex justify-center items-center'
+      style={{ flex: 1, position: 'absolute', top: 0, left: 0, height: '100%', width: '100%' }}
+    >
+      <CatFootPrint color='#8B4513' width={320} height={320} />
     </View>
-  </ScrollView>
+    <ScrollView>
+      <View style={[styles.scene, { position: 'relative' }]} className='flex flex-col p-[16px] pb-[96px] gap-[16px]'>
+        <CommentCard
+          data={{
+            id: '1',
+            commentatorName: 'Ernesto Lopez',
+            score: 3,
+            comment:
+              'Buena experiencia, pero faltó más información sobre los cuidados y la comunicación pudo ser más rápida. Agradezco la adopción.',
+          }}
+        />
+        <CommentCard
+          data={{
+            id: '2',
+            commentatorName: 'Alejandro Perez',
+            score: 5,
+            comment:
+              'Excelente experiencia. La persona fue muy amable, brindó toda la información necesaria y se notaba su amor por los animales. ¡Gracias por la adopción!',
+          }}
+        />
+        <CommentCard
+          data={{
+            id: '3',
+            commentatorName: 'Ernesto Lopez',
+            score: 4,
+            comment:
+              'Buena experiencia, pero faltó más información sobre los cuidados y la comunicación pudo ser más rápida. Agradezco la adopción.',
+          }}
+        />
+        <CommentCard
+          data={{
+            id: '4',
+            commentatorName: 'Alejandro Perez',
+            score: 5,
+            comment:
+              'Excelente experiencia. La persona fue muy amable, brindó toda la información necesaria y se notaba su amor por los animales. ¡Gracias por la adopción!',
+          }}
+        />
+      </View>
+    </ScrollView>
+  </View>
 )
 
 export default function Profile() {

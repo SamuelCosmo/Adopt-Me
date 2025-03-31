@@ -1,13 +1,15 @@
+import CatFootPrint from '@/assets/svg/catFootPrint'
 import AddButton from '@/components/AddButton'
 import ModalPets from '@/components/ModalPets'
 import ModalSignIn from '@/components/ModalSignIn'
 import PetCard from '@/components/PetCard'
-import { GlobalContext } from '@/store/StoreContext'
+import { setOpenModalSignIn } from '@/store/slices/modalSignInSlice'
 import { PetsProps } from '@/utils/interfaces'
 import { useRouter } from 'expo-router'
-import { useContext, useState } from 'react'
+import { useState } from 'react'
 import { StyleSheet, View, FlatList, Dimensions } from 'react-native'
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context'
+import { useSelector, useDispatch } from 'react-redux'
 const catImage = require('../assets/images/cat.jpg')
 const dogImage = require('../assets/images/dog.webp')
 
@@ -56,8 +58,11 @@ export default function HomeScreen() {
   const [openModal, setOpenModal] = useState<boolean>(false)
   const [petToShow, setPetToShow] = useState<PetsProps>(defaultPet)
 
-  const { openModalSignIn, setOpenModalSignIn } = useContext(GlobalContext)
   const router = useRouter()
+  const dispatch = useDispatch()
+  const openModalSignIn = useSelector((state: any) => {
+    return state.modalSignIn.openModalSignIn
+  })
 
   return (
     <SafeAreaProvider>
@@ -70,7 +75,7 @@ export default function HomeScreen() {
         <ModalSignIn
           openModal={openModalSignIn}
           setOpenModal={(value: boolean) => {
-            setOpenModalSignIn(value)
+            dispatch(setOpenModalSignIn(value))
           }}
         />
         <ModalPets
@@ -80,6 +85,12 @@ export default function HomeScreen() {
           }}
           petToShow={petToShow}
         />
+        <View
+          className='flex justify-center items-center'
+          style={{ flex: 1, position: 'absolute', top: 0, left: 0, height: '100%', width: '100%' }}
+        >
+          <CatFootPrint color='#8B4513' width={320} height={320} />
+        </View>
         <FlatList
           data={data}
           keyExtractor={(item) => item.id}
