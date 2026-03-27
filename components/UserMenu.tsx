@@ -1,7 +1,6 @@
 import { useRouter } from 'expo-router'
 import React from 'react'
 import { StyleSheet, Pressable, View, Text } from 'react-native'
-import OutsidePressHandler from 'react-native-outside-press'
 import { signOutUser } from '@/store/slices/authSlice'
 import { useDispatch } from 'react-redux'
 import { AppDispatch } from '@/store/StoreContext'
@@ -17,11 +16,7 @@ export default function UserMenu({ showMenu, closeMenu }: UserMenuProps) {
 
   return (
     showMenu && (
-      <OutsidePressHandler
-        onOutsidePress={() => {
-          closeMenu()
-        }}
-      >
+      <Pressable style={{flex: 1}} onPress={closeMenu}>
         <View style={styles.body}>
           <Pressable
             onPress={() => {
@@ -44,7 +39,7 @@ export default function UserMenu({ showMenu, closeMenu }: UserMenuProps) {
             <Text className='font-bold text-white'>Sign Out</Text>
           </Pressable>
         </View>
-      </OutsidePressHandler>
+      </Pressable>
     )
   )
 }

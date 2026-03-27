@@ -4,6 +4,10 @@ __generated__
 web-build
 bare-apps
 
+# pnpm
+.pnpm-store/       # pnpm store (if local path is used)
+.pnpm/             # internal pnpm folder in node_modules
+
 # macOS
 .DS_Store
 
@@ -11,6 +15,7 @@ bare-apps
 node_modules
 npm-debug.log
 yarn-error.log
+.pnpm-debug.log  # pnpm debug logs
 
 # Ruby
 .direnv

@@ -5,16 +5,16 @@ interface Props {
   onClick?: () => void
   stylesButton?: any
   color?: string
-  width?: string
-  height?: string
+  width?: number
+  height?: number
 }
 
 export default function AddButton({
   onClick = () => {},
   stylesButton = {},
   color = '#fff',
-  width = '48px',
-  height = '48px',
+  width = 48,
+  height = 48,
 }: Props) {
   return (
     <Pressable style={{ ...styles.button, ...stylesButton }} onPress={onClick}>

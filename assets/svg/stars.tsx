@@ -1,12 +1,12 @@
 import Svg, { Path } from 'react-native-svg'
 
 interface SvgProps {
-  width?: string
-  height?: string
+  width?: number
+  height?: number
   color?: string
 }
 
-export function StarEmptyIcon({ width = '12px', height = '12px', color = '#8B4513' }: SvgProps) {
+export function StarEmptyIcon({ width = 12, height = 12, color = '#8B4513' }: SvgProps) {
   return (
     <Svg width={width} height={height} viewBox='0 0 1920 1920'>
       <Path
@@ -18,7 +18,7 @@ export function StarEmptyIcon({ width = '12px', height = '12px', color = '#8B451
   )
 }
 
-export function StarFilledIcon({ width = '12px', height = '12px', color = '#8B4513' }: SvgProps) {
+export function StarFilledIcon({ width = 12, height = 12, color = '#8B4513' }: SvgProps) {
   return (
     <Svg width={width} height={height} viewBox='0 0 1920 1920'>
       <Path
