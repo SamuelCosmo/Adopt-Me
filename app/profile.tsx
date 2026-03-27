@@ -1,18 +1,8 @@
-import {
-  StyleSheet,
-  View,
-  Text,
-  SafeAreaView,
-  useWindowDimensions,
-  FlatList,
-  Dimensions,
-  Pressable,
-} from 'react-native'
+import { StyleSheet, View, Text, SafeAreaView, FlatList, Dimensions, Pressable } from 'react-native'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import Svg, { Path } from 'react-native-svg'
 import { StarEmptyIcon, StarFilledIcon } from '@/assets/svg/stars'
 import { useState } from 'react'
-import { TabBar, TabView } from 'react-native-tab-view'
 import { PetsProps } from '@/utils/interfaces'
 import PetCard from '@/components/PetCard'
 import ModalPets from '@/components/ModalPets'
@@ -21,6 +11,7 @@ import CommentCard from '@/components/CommentCard'
 import { ScrollView } from 'react-native-gesture-handler'
 import AddButton from '@/components/AddButton'
 import { useRouter } from 'expo-router'
+
 const catImage = require('../assets/images/cat.jpg')
 const dogImage = require('../assets/images/dog.webp')
 
@@ -69,72 +60,56 @@ interface FirstRouteProps {
 }
 
 const windowWidth = Dimensions.get('window').width
-const windowHeight = Dimensions.get('window').height
 
 const FirstRoute = ({ setOpenModal, setPetToShow }: FirstRouteProps) => {
-  const [gridList, setGridList] = useState<boolean>(false)
+  const [gridList, setGridList] = useState(false)
 
   return (
-    <View style={[styles.scene, {}]}>
+    <View style={styles.scene}>
       <Pressable onPress={() => setGridList(!gridList)}>
         <View className='w-full flex flex-row justify-end items-center pt-[16px] pb-[16px] pr-[16px] gap-[8px]'>
           <View
             className='flex flex-row items-center justify-center gap-[8px] p-[8px] rounded-lg'
             style={{ backgroundColor: '#cdd2d3' }}
           >
-            <GridIcon width='24px' height='24px' color='#7c7c7c' />
-            <ListIcon width='28px' height='28px' color='#7c7c7c' />
+            <GridIcon width={24} height={24} color='#7c7c7c' />
+            <ListIcon width={28} height={28} color='#7c7c7c' />
           </View>
         </View>
       </Pressable>
-      {gridList && (
-        <FlatList
-          data={data}
-          keyExtractor={(item) => item.id}
-          numColumns={2}
-          renderItem={({ item }) => (
-            <View style={{ ...styles.card_container, width: windowWidth / 2 - 32 }}>
-              <PetCard
-                petToShow={item}
-                onClick={() => {
-                  setOpenModal(true)
-                  setPetToShow(item)
-                }}
-                orientation={'column'}
-              />
-            </View>
-          )}
-          columnWrapperStyle={styles.row}
-          contentContainerStyle={styles.gridContainer}
-        />
-      )}
-      {!gridList && (
-        <FlatList
-          data={data}
-          keyExtractor={(item) => item.id}
-          numColumns={1}
-          renderItem={({ item }) => (
-            <View style={{ ...styles.card_container, width: '100%' }}>
-              <PetCard
-                petToShow={item}
-                onClick={() => {
-                  setOpenModal(true)
-                  setPetToShow(item)
-                }}
-                orientation={'row'}
-              />
-            </View>
-          )}
-          contentContainerStyle={styles.gridContainer}
-        />
-      )}
+
+      <FlatList
+        data={data}
+        keyExtractor={(item) => item.id}
+        numColumns={gridList ? 2 : 1}
+        key={gridList ? 'grid' : 'list'} // ← Aquí se fuerza el reinicio del FlatList
+        renderItem={({ item }) => (
+          <View
+            style={{
+              ...styles.card_container,
+              width: gridList ? windowWidth / 2 - 32 : '100%',
+            }}
+          >
+            <PetCard
+              petToShow={item}
+              onClick={() => {
+                setOpenModal(true)
+                setPetToShow(item)
+              }}
+              orientation={gridList ? 'column' : 'row'}
+            />
+          </View>
+        )}
+        columnWrapperStyle={gridList ? styles.row : undefined}
+        contentContainerStyle={styles.gridContainer}
+      />
     </View>
   )
 }
 
 const SecondRoute = () => (
   <ScrollView>
-    <View style={[styles.scene, { position: 'relative' }]} className='flex flex-col p-[16px] pb-[96px] gap-[16px]'>
+    <View style={[styles.scene, { padding: 16, paddingBottom: 96, gap: 16 }]}>
       <CommentCard
         data={{
           id: '1',
@@ -176,48 +151,23 @@ const SecondRoute = () => (
 )
 
 export default function Profile() {
-  const [openModal, setOpenModal] = useState<boolean>(false)
-  const [petToShow, setPetToShow] = useState<PetsProps>(defaultPet)
-  const layout = useWindowDimensions()
-  const [index, setIndex] = useState(0)
+  const [openModal, setOpenModal] = useState(false)
+  const [petToShow, setPetToShow] = useState(defaultPet)
+  const [tab, setTab] = useState<'pets' | 'comments'>('pets')
   const router = useRouter()
-  const [routes] = useState([
-    { key: 'first', title: 'Pets' },
-    { key: 'second', title: 'Comments' },
-  ])
-
-  const renderScene = ({ route }: { route: { key: string } }) => {
-    switch (route.key) {
-      case 'first':
-        return <FirstRoute setOpenModal={setOpenModal} setPetToShow={setPetToShow} />
-      case 'second':
-        return <SecondRoute />
-      default:
-        return null
-    }
-  }
 
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>
         <View style={{ flex: 1, width: '100%' }}>
-          {index === 1 && (
-            <AddButton
-              onClick={() => {
-                router.push('/publish_comment')
-              }}
-            />
-          )}
-          <ModalPets
-            openModal={openModal}
-            setOpenModal={(value: boolean) => {
-              setOpenModal(value)
-            }}
-            petToShow={petToShow}
-          />
+          {tab === 'comments' && <AddButton onClick={() => router.push('/publish_comment')} />}
+
+          <ModalPets openModal={openModal} setOpenModal={setOpenModal} petToShow={petToShow} />
+
+          {/* Header */}
           <View style={styles.headerContainer}>
             <View style={styles.profileIcon}>
-              <Svg width='56px' height='56px' viewBox='0 0 24 24' fill='none'>
+              <Svg width={56} height={56} viewBox='0 0 24 24' fill='none'>
                 <Path
                   d='M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z'
                   stroke='#7c7c7c'
@@ -227,37 +177,39 @@ export default function Profile() {
                 />
               </Svg>
             </View>
-            <Text className='text-[18px]' style={{ fontWeight: '800', color: '#7c7c7c' }}>
-              Samuel Gutierrez
-            </Text>
-            <View className='flex flex-row gap-[2px]'>
-              {Array.from({ length: 5 }).map((_, index) => (
-                <View key={index}>
-                  {index < 3 ? (
-                    <StarFilledIcon width='18px' height='18px' color='#7c7c7c' />
+
+            <Text style={styles.name}>Samuel Gutierrez</Text>
+
+            <View style={{ flexDirection: 'row' }}>
+              {Array.from({ length: 5 }).map((_, i) => (
+                <View key={i}>
+                  {i < 3 ? (
+                    <StarFilledIcon width={18} height={18} color='#7c7c7c' />
                   ) : (
-                    <StarEmptyIcon width='18px' height='18px' color='#7c7c7c' />
+                    <StarEmptyIcon width={18} height={18} color='#7c7c7c' />
                   )}
                 </View>
               ))}
             </View>
           </View>
 
+          {/* Tabs */}
           <View style={{ flex: 1 }}>
-            <TabView
-              navigationState={{ index, routes }}
-              renderScene={renderScene}
-              onIndexChange={setIndex}
-              initialLayout={{ width: layout.width }}
-              renderTabBar={(props) => (
-                <TabBar
-                  {...props}
-                  activeColor='#7c7c7c' // Color del texto cuando está activo
-                  inactiveColor='#7c7c7c'
-                  style={styles.tabBar}
-                />
-              )}
-            />
+            <View style={styles.tabsContainer}>
+              <Pressable style={[styles.tabItem, tab === 'pets' && styles.activeTab]} onPress={() => setTab('pets')}>
+                <Text style={styles.tabText}>Pets</Text>
+              </Pressable>
+
+              <Pressable
+                style={[styles.tabItem, tab === 'comments' && styles.activeTab]}
+                onPress={() => setTab('comments')}
+              >
+                <Text style={styles.tabText}>Comments</Text>
+              </Pressable>
+            </View>
+
+            {tab === 'pets' && <FirstRoute setOpenModal={setOpenModal} setPetToShow={setPetToShow} />}
+            {tab === 'comments' && <SecondRoute />}
           </View>
         </View>
       </SafeAreaView>
@@ -266,43 +218,17 @@ export default function Profile() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    width: '100%',
-  },
-  headerContainer: {
-    backgroundColor: '#f3f7f9',
-    padding: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  profileIcon: {
-    borderRadius: 50,
-    borderColor: '#7c7c7c',
-    borderWidth: 4,
-    padding: 8,
-  },
-  scene: { flex: 1, paddingVertical: 16, backgroundColor: 'transparent' },
-  tabBar: {
-    backgroundColor: '#f3f7f9',
-    color: '#000',
-  },
-  gridContainer: {
-    gap: 16,
-    paddingHorizontal: 16,
-    width: '100%',
-    maxWidth: windowWidth,
-  },
-  row: {
-    justifyContent: 'center',
-    gap: 16,
-    width: '100%',
-  },
-  card_container: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+  container: { flex: 1, alignItems: 'center', width: '100%' },
+  headerContainer: { backgroundColor: '#f3f7f9', padding: 16, alignItems: 'center' },
+  profileIcon: { borderRadius: 50, borderWidth: 4, padding: 8 },
+  name: { fontWeight: '800', color: '#7c7c7c' },
+  scene: { flex: 1, paddingVertical: 16 },
+  gridContainer: { gap: 16, paddingHorizontal: 16 },
+  row: { justifyContent: 'center', gap: 16 },
+  card_container: { alignItems: 'center' },
+
+  tabsContainer: { flexDirection: 'row', backgroundColor: '#f3f7f9' },
+  tabItem: { flex: 1, padding: 12, alignItems: 'center' },
+  activeTab: { borderBottomWidth: 2, borderBottomColor: '#7c7c7c' },
+  tabText: { color: '#7c7c7c', fontWeight: '600' },
 })

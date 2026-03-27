@@ -73,8 +73,8 @@ export default function PublishPet() {
                   <AddButton
                     stylesButton={styles.add_button_image}
                     color='white'
-                    width='16px'
-                    height='16px'
+                    width={16}
+                    height={16}
                     onClick={() => {
                       const newList = [...images]
                       newList.splice(index, 1)
