@@ -120,6 +120,7 @@ export const signOutUser = createAsyncThunk(
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
+        body: JSON.stringify({ token }),
       })
 
       const data = await res.json()
@@ -133,6 +134,11 @@ export const signOutUser = createAsyncThunk(
       }
     } catch (error: any) {
       console.error('Error during sign-out:', error)
+
+      // Clear session regardless of server validation error
+      await clearStoredSession()
+      dispatch(signOut())
+      dispatch(setOpenModalSignIn(true))
       return rejectWithValue(error.message || 'Sign-out failed')
     }
   }
