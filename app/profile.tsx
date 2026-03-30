@@ -3,6 +3,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context'
 import Svg, { Path } from 'react-native-svg'
 import { StarEmptyIcon, StarFilledIcon } from '@/assets/svg/stars'
 import { useState } from 'react'
+import { useSelector } from 'react-redux'
 import { PetsProps } from '@/utils/interfaces'
 import PetCard from '@/components/PetCard'
 import ModalPets from '@/components/ModalPets'
@@ -128,24 +129,6 @@ const SecondRoute = () => (
             'Excelente experiencia. La persona fue muy amable, brindó toda la información necesaria y se notaba su amor por los animales. ¡Gracias por la adopción!',
         }}
       />
-      <CommentCard
-        data={{
-          id: '3',
-          commentatorName: 'Ernesto Lopez',
-          score: 4,
-          comment:
-            'Buena experiencia, pero faltó más información sobre los cuidados y la comunicación pudo ser más rápida. Agradezco la adopción.',
-        }}
-      />
-      <CommentCard
-        data={{
-          id: '4',
-          commentatorName: 'Alejandro Perez',
-          score: 5,
-          comment:
-            'Excelente experiencia. La persona fue muy amable, brindó toda la información necesaria y se notaba su amor por los animales. ¡Gracias por la adopción!',
-        }}
-      />
     </View>
   </ScrollView>
 )
@@ -155,6 +138,7 @@ export default function Profile() {
   const [petToShow, setPetToShow] = useState(defaultPet)
   const [tab, setTab] = useState<'pets' | 'comments'>('pets')
   const router = useRouter()
+  const userName = useSelector((state: any) => state.auth.user.name)
 
   return (
     <SafeAreaProvider>
@@ -178,7 +162,7 @@ export default function Profile() {
               </Svg>
             </View>
 
-            <Text style={styles.name}>Samuel Gutierrez</Text>
+            <Text style={styles.name}>{userName}</Text>
 
             <View style={{ flexDirection: 'row' }}>
               {Array.from({ length: 5 }).map((_, i) => (

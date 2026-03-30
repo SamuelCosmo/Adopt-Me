@@ -1,7 +1,8 @@
 import { StarEmptyIcon, StarFilledIcon } from '@/assets/svg/stars'
+import CustomButton from '@/components/CustomButton'
 import { useRouter } from 'expo-router'
 import { useState } from 'react'
-import { StyleSheet, Pressable, ScrollView, Text, TextInput, Dimensions, View } from 'react-native'
+import { StyleSheet, Pressable, View, Text, TextInput, Dimensions } from 'react-native'
 
 const windowWidth = Dimensions.get('window').width
 const windowHeight = Dimensions.get('window').height
@@ -12,7 +13,7 @@ export default function PublishComment() {
   const router = useRouter()
 
   return (
-    <ScrollView style={{ ...styles.container }}>
+    <View style={{ ...styles.container }}>
       <Text style={styles.title}>Comment</Text>
       <TextInput
         style={[styles.input, { height: 100 }]}
@@ -27,25 +28,23 @@ export default function PublishComment() {
           <View key={index}>
             {index < score ? (
               <Pressable onPress={() => setScore(index + 1)}>
-                <StarFilledIcon width='32' height='32' />
+                <StarFilledIcon width={32} height={32} />
               </Pressable>
             ) : (
               <Pressable onPress={() => setScore(index + 1)}>
-                <StarEmptyIcon width='32' height='32' />
+                <StarEmptyIcon width={32} height={32} />
               </Pressable>
             )}
           </View>
         ))}
       </View>
-      <Pressable
+      <CustomButton
+        title='Submit'
         onPress={() => {
           router.push('/profile')
         }}
-        style={{ backgroundColor: '#00639c', padding: 16, borderRadius: 8, marginTop: 16, alignItems: 'center' }}
-      >
-        <Text className='text-white font-bold'>Submit</Text>
-      </Pressable>
-    </ScrollView>
+      />
+    </View>
   )
 }
 
@@ -54,6 +53,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
     width: '100%',
+    gap: 16,
   },
   gridContainer: {
     gap: 8,

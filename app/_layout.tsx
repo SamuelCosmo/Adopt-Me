@@ -1,6 +1,6 @@
 import { useFonts } from 'expo-font'
 import * as SplashScreen from 'expo-splash-screen'
-import { useContext, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import 'react-native-reanimated'
 import '../global.css'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
@@ -8,8 +8,11 @@ import { Drawer } from 'expo-router/drawer'
 import CustomDrawerContent from '@/components/CustomDrawerContent'
 import { Pressable, StatusBar, View } from 'react-native'
 import Svg, { Path } from 'react-native-svg'
-import { GlobalContext, GlobalProvider } from '@/store/StoreContext'
+import { AppDispatch, store } from '@/store/StoreContext'
 import UserMenu from '@/components/UserMenu'
+import { Provider, useDispatch, useSelector } from 'react-redux'
+import { setOpenModalSignIn } from '@/store/slices/modalSignInSlice'
+import { restoreSession } from '@/store/slices/authSlice'
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync()
@@ -21,96 +24,111 @@ export default function RootLayout() {
 
   useEffect(() => {
     if (loaded) {
-      SplashScreen.hideAsync()
+      try {
+        SplashScreen.hideAsync();
+      } catch (error) {
+        console.error('Error hiding splash screen:', error);
+      }
     }
-  }, [loaded])
+  }, [loaded]);
 
   if (!loaded) {
     return null
   }
 
   return (
-    <GlobalProvider>
-      <GestureHandlerRootView style={{ flex: 1 }}>
-        <StatusBar backgroundColor='#8B4513' barStyle='light-content' />
-        <Drawer
-          drawerContent={CustomDrawerContent}
-          screenOptions={{
-            drawerActiveTintColor: '#FFFFFF',
-            drawerInactiveTintColor: '#FFFFFF',
-            headerStyle: {
-              backgroundColor: '#8B4513',
-            },
-            headerTintColor: '#ffffff',
-            headerTitle: () => <CatSvg />,
-            headerRight: () => <SignInButton />,
-          }}
-        >
-          <Drawer.Screen
-            name='index'
-            options={{
-              drawerLabel: 'Home',
-              title: '',
-              headerTitleAlign: 'center',
+      <Provider store={store}>
+        <GestureHandlerRootView style={{ flex: 1 }}>
+          <SessionBootstrap />
+          <StatusBar backgroundColor='#8B4513' barStyle='light-content' />
+          <Drawer
+            drawerContent={CustomDrawerContent}
+            screenOptions={{
+              drawerActiveTintColor: '#FFFFFF',
+              drawerInactiveTintColor: '#FFFFFF',
+              headerStyle: {
+                backgroundColor: '#8B4513',
+              },
+              headerTintColor: '#ffffff',
+              headerTitle: () => <CatSvg />,
+              headerRight: () => <SignInButton />,
             }}
-          />
-          <Drawer.Screen
-            name='categories'
-            options={{
-              drawerLabel: 'Categories',
-              title: '',
-              headerTitleAlign: 'center',
-            }}
-          />
-          <Drawer.Screen
-            name='history'
-            options={{
-              drawerLabel: 'History',
-              title: '',
-              headerTitleAlign: 'center',
-            }}
-          />
-          <Drawer.Screen
-            name='chats'
-            options={{
-              drawerLabel: 'Chats',
-              title: '',
-              headerTitleAlign: 'center',
-            }}
-          />
-          <Drawer.Screen
-            name='about'
-            options={{
-              drawerLabel: 'About Us',
-              title: '',
-              headerTitleAlign: 'center',
-            }}
-          />
-          <Drawer.Screen
-            name='profile'
-            options={{
-              drawerItemStyle: { display: 'none' },
-              headerTitleAlign: 'center',
-            }}
-          />
-          <Drawer.Screen
-            name='publish_pet'
-            options={{
-              drawerItemStyle: { display: 'none' },
-              headerTitleAlign: 'center',
-            }}
-          />
-          <Drawer.Screen
-            name='publish_comment'
-            options={{
-              drawerItemStyle: { display: 'none' },
-              headerTitleAlign: 'center',
-            }}
-          />
-        </Drawer>
-      </GestureHandlerRootView>
-    </GlobalProvider>
+          >
+            <Drawer.Screen
+              name='index'
+              options={{
+                drawerLabel: 'Home',
+                title: '',
+                headerTitleAlign: 'center',
+              }}
+            />
+            <Drawer.Screen
+              name='categories'
+              options={{
+                drawerLabel: 'Categories',
+                title: '',
+                headerTitleAlign: 'center',
+              }}
+            />
+            <Drawer.Screen
+              name='history'
+              options={{
+                drawerLabel: 'History',
+                title: '',
+                headerTitleAlign: 'center',
+              }}
+            />
+            <Drawer.Screen
+              name='chats'
+              options={{
+                drawerLabel: 'Chats',
+                title: '',
+                headerTitleAlign: 'center',
+              }}
+            />
+            <Drawer.Screen
+              name='about'
+              options={{
+                drawerLabel: 'About Us',
+                title: '',
+                headerTitleAlign: 'center',
+              }}
+            />
+            <Drawer.Screen
+              name='profile'
+              options={{
+                drawerItemStyle: { display: 'none' },
+                headerTitleAlign: 'center',
+              }}
+            />
+            <Drawer.Screen
+              name='publish_pet'
+              options={{
+                drawerItemStyle: { display: 'none' },
+                headerTitleAlign: 'center',
+              }}
+            />
+            <Drawer.Screen
+              name='publish_comment'
+              options={{
+                drawerItemStyle: { display: 'none' },
+                headerTitleAlign: 'center',
+              }}
+            />
+          </Drawer>
+        </GestureHandlerRootView>
+      </Provider>
   )
+}
+
+function SessionBootstrap() {
+  const dispatch = useDispatch<AppDispatch>()
+
+  useEffect(() => {
+    dispatch(restoreSession())
+  }, [dispatch])
+
+  return null
 }
 
 function CatSvg() {
@@ -138,14 +156,19 @@ function CatSvg() {
 }
 
 function SignInButton() {
-  const { setOpenModalSignIn } = useContext(GlobalContext)
+  const dispatch = useDispatch()
+  const token = useSelector((state: any) => state.auth.user.token)
   const [showMenu, setShowMenu] = useState(false)
-  const [isSignIn, setIsSignIn] = useState(true)
+  const [isSignIn, setIsSignIn] = useState(!!token)
+
+  useEffect(() => {
+    setIsSignIn(!!token)
+  }, [token])
 
   return (
     <Pressable
       onPress={() => {
-        if (!isSignIn) setOpenModalSignIn(true)
+        if (!isSignIn) dispatch(setOpenModalSignIn(true))
         else setShowMenu(!showMenu)
       }}
     >
