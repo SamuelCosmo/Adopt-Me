@@ -4,6 +4,8 @@ import Svg, { Path } from 'react-native-svg'
 import { useDispatch } from 'react-redux'
 import { loginUser, signUpUser } from '@/store/slices/authSlice'
 import { AppDispatch } from '@/store/StoreContext'
+import CustomButton from './CustomButton'
+import { isLoading } from 'expo-font'
 
 interface Props {
   openModal: boolean
@@ -12,6 +14,8 @@ interface Props {
 
 interface FormProps {
   changeForm: () => void
+  isLoading: boolean
+  setIsLoading: (loading: boolean) => void
 }
 
 interface PasswordProps {
@@ -27,6 +31,7 @@ const windowHeight = Dimensions.get('window').height
 
 export default function ModalSignIn({ openModal, setOpenModal }: Props) {
   const [isSignIn, setIsSignIn] = useState<boolean>(true)
+  const [isLoading, setIsLoading] = useState<boolean>(false)
 
   return (
     <Modal
@@ -44,12 +49,16 @@ export default function ModalSignIn({ openModal, setOpenModal }: Props) {
             changeForm={() => {
               setIsSignIn(!isSignIn)
             }}
+            isLoading={isLoading}
+            setIsLoading={setIsLoading}
           />
         ) : (
           <SignUpForm
             changeForm={() => {
               setIsSignIn(!isSignIn)
             }}
+            isLoading={isLoading}
+            setIsLoading={setIsLoading}
           />
         )}
       </View>
@@ -84,7 +93,7 @@ function CatSvg() {
   )
 }
 
-function SignInForm({ changeForm }: FormProps) {
+function SignInForm({ changeForm, isLoading, setIsLoading }: FormProps) {
   const dispatch = useDispatch<AppDispatch>()
   const [email, setEmail] = useState<string>('')
   const [password, setPassword] = useState<string>('')
@@ -108,29 +117,29 @@ function SignInForm({ changeForm }: FormProps) {
         setShowPassword={setShowPassword}
       />
       <View className='flex flex-column gap-[8px]'>
-        <Pressable
-          style={stylesModal.button}
+        <CustomButton
+          title='Sign In'
           onPress={async () => {
+            setIsLoading(true)
             await dispatch(loginUser({ email: email, password: password }))
+            setIsLoading(false)
           }}
-        >
-          <Text className='text-white'>Sign In</Text>
-        </Pressable>
+          isLoading={isLoading}
+        />
       </View>
       <View className='w-full h-[1px] bg-gray-200 mt-[4px] mb-[4px]'></View>
-      <Pressable
-        style={stylesModal.button_cancel}
+      <CustomButton
+        title='Sign Up'
+        styles='cancel'
         onPress={() => {
           changeForm()
         }}
-      >
-        <Text style={stylesModal.button_text}>Sign Up</Text>
-      </Pressable>
+      />
     </View>
   )
 }
 
-function SignUpForm({ changeForm }: FormProps) {
+function SignUpForm({ changeForm, isLoading, setIsLoading }: FormProps) {
   const dispatch = useDispatch<AppDispatch>()
   const [username, setUsername] = useState<string>('')
   const [email, setEmail] = useState<string>('')
@@ -171,26 +180,27 @@ function SignUpForm({ changeForm }: FormProps) {
         setShowPassword={setShowRepeatedPassword}
       />
       <View className='flex flex-column gap-[8px]'>
-        <Pressable
-          style={stylesModal.button}
+        <CustomButton
+          title='Sign Up'
           onPress={async () => {
-            if (username !== '' && email !== '' && password !== '' && password === repeatedPassword)
+            if (username !== '' && email !== '' && password !== '' && password === repeatedPassword) {
+              setIsLoading(true)
               await dispatch(signUpUser({ name: username, email: email, password: password }))
-            else alert('Invalid data...')
+              setIsLoading(false)
+              changeForm()
+            } else alert('Invalid data...')
           }}
-        >
-          <Text className='text-white'>Sign Up</Text>
-        </Pressable>
+          isLoading={isLoading}
+        />
       </View>
       <View className='w-full h-[1px] bg-gray-200 mt-[4px] mb-[4px]'></View>
-      <Pressable
-        style={stylesModal.button_cancel}
+      <CustomButton
+        title='Sign In'
+        styles='cancel'
         onPress={() => {
           changeForm()
         }}
-      >
-        <Text style={stylesModal.button_text}>Sign In</Text>
-      </Pressable>
+      />
     </View>
   )
 }
@@ -277,30 +287,5 @@ const stylesModal = StyleSheet.create({
     marginBottom: 12,
     color: 'black',
     position: 'relative',
-  },
-  button: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: '100%',
-    borderRadius: 8,
-    borderWidth: 2,
-    borderColor: '#8B4513',
-    padding: 4,
-    backgroundColor: '#8B4513',
-  },
-  button_cancel: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: '100%',
-    borderRadius: 8,
-    borderWidth: 2,
-    borderColor: '#8B4513',
-    padding: 4,
-    backgroundColor: 'transparent',
-  },
-  button_text: {
-    color: '#8B4513',
   },
 })

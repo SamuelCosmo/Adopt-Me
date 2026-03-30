@@ -3,9 +3,9 @@ import * as ImagePicker from 'expo-image-picker'
 import { useState } from 'react'
 import AddButton from '@/components/AddButton'
 import { useRouter } from 'expo-router'
+import CustomButton from '@/components/CustomButton'
 
 const windowWidth = Dimensions.get('window').width
-const windowHeight = Dimensions.get('window').height
 
 export default function PublishPet() {
   const [perName, setPetName] = useState<string>('')
@@ -41,7 +41,7 @@ export default function PublishPet() {
   }
 
   return (
-    <ScrollView style={{ ...styles.container }}>
+    <View style={{ ...styles.container }}>
       <Text style={styles.title}>Pet Name</Text>
       <TextInput
         style={styles.input}
@@ -92,15 +92,14 @@ export default function PublishPet() {
           contentContainerStyle={styles.gridContainer}
         />
       )}
-      <Pressable
+      <CustomButton
+        title='Submit'
         onPress={() => {
           router.push('/')
         }}
-        style={{ backgroundColor: '#00639c', padding: 16, borderRadius: 8, marginTop: 16, alignItems: 'center' }}
-      >
-        <Text className='text-white font-bold'>Submit</Text>
-      </Pressable>
-    </ScrollView>
+        customStyles={styles.submit}
+      />
+    </View>
   )
 }
 
@@ -176,5 +175,9 @@ const styles = StyleSheet.create({
     borderRadius: '50%',
     elevation: 0,
     padding: 0,
+  },
+
+  submit: {
+    marginTop: 16,
   },
 })

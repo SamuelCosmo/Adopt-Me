@@ -8,10 +8,11 @@ import { Drawer } from 'expo-router/drawer'
 import CustomDrawerContent from '@/components/CustomDrawerContent'
 import { Pressable, StatusBar, View } from 'react-native'
 import Svg, { Path } from 'react-native-svg'
-import { store } from '@/store/StoreContext'
+import { AppDispatch, store } from '@/store/StoreContext'
 import UserMenu from '@/components/UserMenu'
 import { Provider, useDispatch, useSelector } from 'react-redux'
 import { setOpenModalSignIn } from '@/store/slices/modalSignInSlice'
+import { restoreSession } from '@/store/slices/authSlice'
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync()
@@ -38,6 +39,7 @@ export default function RootLayout() {
   return (
       <Provider store={store}>
         <GestureHandlerRootView style={{ flex: 1 }}>
+          <SessionBootstrap />
           <StatusBar backgroundColor='#8B4513' barStyle='light-content' />
           <Drawer
             drawerContent={CustomDrawerContent}
@@ -117,6 +119,16 @@ export default function RootLayout() {
         </GestureHandlerRootView>
       </Provider>
   )
+}
+
+function SessionBootstrap() {
+  const dispatch = useDispatch<AppDispatch>()
+
+  useEffect(() => {
+    dispatch(restoreSession())
+  }, [dispatch])
+
+  return null
 }
 
 function CatSvg() {

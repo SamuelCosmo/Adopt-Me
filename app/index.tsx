@@ -60,6 +60,7 @@ export default function HomeScreen() {
 
   const router = useRouter()
   const dispatch = useDispatch()
+  const token = useSelector((state: any) => state.auth.user.token)
   const openModalSignIn = useSelector((state: any) => {
     return state.modalSignIn.openModalSignIn
   })
@@ -67,11 +68,13 @@ export default function HomeScreen() {
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>
-        <AddButton
-          onClick={() => {
-            router.push('/publish_pet')
-          }}
-        />
+        {token ? (
+          <AddButton
+            onClick={() => {
+              router.push('/publish_pet')
+            }}
+          />
+        ) : null}
         <ModalSignIn
           openModal={openModalSignIn}
           setOpenModal={(value: boolean) => {
@@ -119,7 +122,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    // paddingTop: StatusBar.currentHeight,
     paddingVertical: 16,
     paddingBottom: 96,
   },

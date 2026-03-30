@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router'
 import React from 'react'
-import { StyleSheet, Pressable, View, Text } from 'react-native'
+import { StyleSheet, Pressable, View, Text, Modal } from 'react-native'
 import { signOutUser } from '@/store/slices/authSlice'
 import { useDispatch } from 'react-redux'
 import { AppDispatch } from '@/store/StoreContext'
@@ -15,8 +15,9 @@ export default function UserMenu({ showMenu, closeMenu }: UserMenuProps) {
   const router = useRouter()
 
   return (
-    showMenu && (
-      <Pressable style={{flex: 1}} onPress={closeMenu}>
+    <Modal visible={showMenu} transparent onRequestClose={closeMenu}>
+      <View style={styles.overlay}>
+        <Pressable style={StyleSheet.absoluteFill} onPress={closeMenu} />
         <View style={styles.body}>
           <Pressable
             onPress={() => {
@@ -39,12 +40,16 @@ export default function UserMenu({ showMenu, closeMenu }: UserMenuProps) {
             <Text className='font-bold text-white'>Sign Out</Text>
           </Pressable>
         </View>
-      </Pressable>
-    )
+      </View>
+    </Modal>
   )
 }
 
 const styles = StyleSheet.create({
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    zIndex: 1000,
+  },
   body: {
     display: 'flex',
     flexDirection: 'column',
