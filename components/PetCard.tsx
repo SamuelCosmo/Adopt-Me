@@ -1,6 +1,7 @@
-import { PetsProps } from '@/utils/interfaces'
+import { AdoptionProps } from '@/utils/interfaces'
 import { View, Image, Text, StyleSheet, Pressable } from 'react-native'
 import Svg, { Path } from 'react-native-svg'
+import { LinearGradient } from 'expo-linear-gradient'
 
 const location = (
   <Svg width={16} height={16} viewBox='-4 0 32 32'>
@@ -16,45 +17,39 @@ const location = (
 )
 
 interface Props {
-  petToShow: PetsProps
+  petToShow: AdoptionProps
   onClick: () => void
   orientation?: 'row' | 'column'
 }
 
 export default function PetCard({ petToShow, onClick, orientation = 'column' }: Props) {
-  // const isRemote = srcImage.startsWith('http') || srcImage.startsWith('https')
+  const isColumn = orientation === 'column'
 
   return (
-    <View
-      style={styles.card}
-      className={orientation === 'column' ? 'flex flex-col rounded-lg' : 'flex items-center flex-row rounded-lg'}
-    >
-      <Pressable onPress={onClick} className='absolute top-0 left-0 w-full h-full z-10'></Pressable>
+    <View style={[styles.card, isColumn ? styles.cardColumn : styles.cardRow]}>
+      <Pressable onPress={onClick} style={styles.overlayPressable}></Pressable>
       <Image
-        source={petToShow.srcImage}
-        style={{ height: orientation === 'column' ? 150 : 120 }}
-        className={
-          orientation === 'column' ? 'rounded-tl-lg rounded-tr-lg w-full' : 'rounded-tl-lg rounded-bl-lg w-1/4'
-        }
+        source={{ uri: petToShow.images[0]?.url || '' }}
+        style={[styles.imageBase, isColumn ? styles.imageColumn : styles.imageRow, { height: isColumn ? 250 : 120 }]}
       />
-      <View className={orientation === 'column' ? 'p-0 pr-[8px] pb-[8px] pl-[8px]' : 'pt-[4px] pb-[4px] w-4/6'}>
+      <View style={isColumn ? styles.contentColumn : styles.contentRow}>
+        {isColumn && <LinearGradient colors={['transparent', 'rgba(0,0,0,0.8)']} style={styles.background} />}
         <Text
-          className={orientation === 'column' ? 'text-xl font-extrabold' : 'font-extrabold'}
-          style={{ color: '#8B4513' }}
+          style={[styles.petName, isColumn ? styles.petNameColumn : undefined]}
           numberOfLines={1}
           ellipsizeMode='tail'
         >
-          {petToShow.name}
+          {petToShow.pet_name}
         </Text>
-        <Text className='text-base' numberOfLines={2} ellipsizeMode='tail'>
-          {petToShow.description}
-        </Text>
-        <View className='flex flex-row w-full justify-between mt-[16px]'>
-          <Text className='font-extrabold' style={{ color: '#8B4513' }}>
-            Age: {petToShow.age}
+        {!isColumn && (
+          <Text style={styles.description} numberOfLines={2} ellipsizeMode='tail'>
+            {petToShow.description}
           </Text>
-          <Text className='text-[12px] font-extrabold text-right' style={{ color: '#8B4513' }}>
-            {location} {petToShow.city}, {petToShow.state}
+        )}
+        <View style={isColumn ? styles.metaColumn : styles.metaRow}>
+          {!isColumn && <Text style={styles.ageText}>Age: {petToShow.age}</Text>}
+          <Text style={isColumn ? styles.locationTextColumn : styles.locationText}>
+            {!isColumn && location} {petToShow.city}, {petToShow.state}
           </Text>
         </View>
       </View>
@@ -63,6 +58,13 @@ export default function PetCard({ petToShow, onClick, orientation = 'column' }: 
 }
 
 const styles = StyleSheet.create({
+  background: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: 300,
+  },
   card: {
     gap: 8,
     backgroundColor: '#ffffff',
@@ -76,5 +78,84 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     width: '100%',
     position: 'relative',
+  },
+  cardColumn: {
+    borderRadius: 8,
+    overflow: 'hidden',
+  },
+  cardRow: {
+    borderRadius: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  overlayPressable: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    zIndex: 10,
+  },
+  imageBase: {
+    borderTopLeftRadius: 8,
+    borderTopRightRadius: 8,
+  },
+  imageColumn: {
+    width: '100%',
+    borderBottomLeftRadius: 8,
+    borderBottomRightRadius: 8,
+  },
+  imageRow: {
+    width: '25%',
+    borderTopRightRadius: 0,
+    borderBottomLeftRadius: 8,
+    borderBottomRightRadius: 0,
+  },
+  contentColumn: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    paddingLeft: 8,
+    paddingRight: 8,
+    paddingBottom: 16,
+    width: '100%',
+  },
+  contentRow: {
+    width: '66.6667%',
+    paddingTop: 4,
+    paddingBottom: 4,
+  },
+  petName: {
+    color: '#8B4513',
+    fontWeight: '800',
+  },
+  petNameColumn: {
+    fontSize: 20,
+    color: '#d1d1d1',
+  },
+  description: {
+    fontSize: 16,
+  },
+  metaColumn: {
+    flexDirection: 'row',
+    width: '100%',
+    justifyContent: 'space-between',
+  },
+  metaRow: { flexDirection: 'row', width: '100%', justifyContent: 'space-between', marginTop: 16 },
+  ageText: {
+    color: '#8B4513',
+    fontWeight: '800',
+  },
+  locationTextColumn: {
+    color: '#d1d1d1',
+    fontSize: 12,
+    fontWeight: '800',
+    textAlign: 'right',
+  },
+  locationText: {
+    color: '#8B4513',
+    fontSize: 12,
+    fontWeight: '800',
+    textAlign: 'right',
   },
 })

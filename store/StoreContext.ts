@@ -1,9 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit'
 import authReducer from './slices/authSlice'
+import adoptionReducer from './slices/adoptionSlice'
 import modalSignInReducer from './slices/modalSignInSlice'
+import petOptionsReducer from './slices/petOptionsSlice'
 
 export const store = configureStore({
-  reducer: { auth: authReducer, modalSignIn: modalSignInReducer },
+  reducer: { auth: authReducer, modalSignIn: modalSignInReducer, adoption: adoptionReducer, petOptions: petOptionsReducer },
 })
 
 export type RootState = ReturnType<typeof store.getState>
