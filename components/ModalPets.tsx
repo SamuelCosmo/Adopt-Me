@@ -1,12 +1,14 @@
-import { StarEmptyIcon, StarFilledIcon } from '@/assets/svg/stars'
-import { PetsProps } from '@/utils/interfaces'
-import { Image, StyleSheet, Text, View, Modal, Pressable, Dimensions, Button } from 'react-native'
+import { AdoptionProps } from '@/utils/interfaces'
+import { useEffect, useRef, useState } from 'react'
+import { Animated, Image, FlatList, StyleSheet, Text, View, Modal, Pressable, Dimensions } from 'react-native'
 import Svg, { Path } from 'react-native-svg'
+import { useRouter } from 'expo-router'
 
 interface Props {
   openModal: boolean
   setOpenModal: (value: boolean) => void
-  petToShow: PetsProps
+  petToShow: AdoptionProps
+  enableEdit?: boolean
 }
 
 const windowWidth = Dimensions.get('window').width
@@ -25,7 +27,49 @@ const location = (
   </Svg>
 )
 
-export default function ModalPets({ openModal, setOpenModal, petToShow }: Props) {
+export default function ModalPets({ openModal, setOpenModal, petToShow, enableEdit = false }: Props) {
+  const router = useRouter()
+  const [currentImageIndex, setCurrentImageIndex] = useState(0)
+
+  useEffect(() => {
+    setCurrentImageIndex(0)
+  }, [openModal])
+
+  const petImages = petToShow?.images?.length > 0 ? petToShow.images : [{ url: '' }]
+
+  const dotWidths = useRef<Animated.Value[]>(petImages.map((_, i) => new Animated.Value(i === 0 ? 16 : 8)))
+
+  useEffect(() => {
+    dotWidths.current = petImages.map((_, i) => new Animated.Value(i === 0 ? 16 : 8))
+    setCurrentImageIndex(0)
+  }, [petToShow])
+
+  useEffect(() => {
+    if (!dotWidths.current.length) return
+    Animated.parallel(
+      dotWidths.current.map((anim, i) =>
+        Animated.timing(anim, {
+          toValue: i === currentImageIndex ? 16 : 8,
+          duration: 200,
+          useNativeDriver: false,
+        }),
+      ),
+    ).start()
+  }, [currentImageIndex])
+
+  const handlePrimaryAction = () => {
+    if (enableEdit) {
+      setOpenModal(false)
+      router.push({
+        pathname: '/publish_pet',
+        params: {
+          pet: JSON.stringify(petToShow),
+        },
+      })
+      return
+    }
+  }
+
   return (
     <Modal
       animationType='slide'
@@ -38,32 +82,57 @@ export default function ModalPets({ openModal, setOpenModal, petToShow }: Props)
       <View style={stylesModal.modal}>
         <Pressable style={stylesModal.background} onPress={() => setOpenModal(false)}></Pressable>
         <View style={stylesModal.body}>
-        <Image source={petToShow?.srcImage} style={{ height: 250 }} className='rounded-tl-lg rounded-tr-lg w-full' />
-          <View className='p-0 pr-[8px] pb-[8px] pl-[8px]'>
-            <Text className='text-xl font-extrabold' style={{ color: '#8B4513' }}>
-              {petToShow?.name}
-            </Text>
-            <View className='flex flex-row w-full items-center justify-start align-center gap-[4px]'>
-              <Text className='font-extrabold' style={{ color: '#8B4513' }}>
-                {petToShow?.owner}
-              </Text>
-              <View className='flex flex-row gap-[2px]'>
-                {Array.from({ length: 5 }).map((_, index) => (
+          <View style={stylesModal.imagesContainer}>
+            <View style={stylesModal.imageSliderContainer}>
+              <FlatList
+                horizontal
+                pagingEnabled
+                showsHorizontalScrollIndicator={false}
+                data={petImages}
+                keyExtractor={(item, index) => `${item.url}-${index}`}
+                getItemLayout={(_, index) => ({
+                  length: windowWidth - 30,
+                  offset: (windowWidth - 30) * index,
+                  index,
+                })}
+                renderItem={({ item }) => <Image source={{ uri: item.url || '' }} style={stylesModal.image} />}
+                onMomentumScrollEnd={(event) => {
+                  const nextIndex = Math.round(event.nativeEvent.contentOffset.x / (windowWidth - 30))
+                  setCurrentImageIndex(nextIndex)
+                }}
+              />
+            </View>
+            <View style={stylesModal.dotsContainer}>
+              {petImages.map((_, index) => (
+                <Animated.View
+                  key={`dot-${index}`}
+                  style={[
+                    index === currentImageIndex ? stylesModal.dotActive : stylesModal.dotInactive,
+                    { width: dotWidths.current[index] ?? (index === currentImageIndex ? 16 : 8) },
+                  ]}
+                />
+              ))}
+            </View>
+          </View>
+          <View style={stylesModal.content}>
+            <Text style={stylesModal.petName}>{petToShow?.pet_name}</Text>
+            <View style={stylesModal.titleRow}>
+              <Text style={stylesModal.brownBoldText}>{petToShow?.title}</Text>
+              <View style={stylesModal.ratingRow}>
+                {/* {Array.from({ length: 5 }).map((_, index) => (
                   <View key={index}>{index < petToShow.score ? <StarFilledIcon /> : <StarEmptyIcon />}</View>
-                ))}
+                ))} */}
               </View>
             </View>
-            <Text className='text-base mt-[8px]'>{petToShow?.description}</Text>
-            <View className='flex flex-row w-full justify-between mt-[8px]'>
-              <Text className='font-extrabold' style={{ color: '#8B4513' }}>
-                Age: {petToShow?.age}
-              </Text>
-              <Text className='font-extrabold' style={{ color: '#8B4513' }}>
+            <Text style={stylesModal.description}>{petToShow?.description}</Text>
+            <View style={stylesModal.detailsRow}>
+              <Text style={stylesModal.brownBoldText}>Age: {petToShow?.age}</Text>
+              <Text style={stylesModal.brownBoldText}>
                 {location} {petToShow.city}, {petToShow.state}
               </Text>
             </View>
-            <Pressable style={stylesModal.button}>
-              <Text className='font-extrabold text-white'>Adopt-Me!</Text>
+            <Pressable style={stylesModal.button} onPress={handlePrimaryAction}>
+              <Text style={stylesModal.buttonText}>{enableEdit ? 'Edit' : 'Adopt-Me!'}</Text>
             </Pressable>
           </View>
         </View>
@@ -93,7 +162,80 @@ const stylesModal = StyleSheet.create({
     position: 'absolute',
     borderRadius: 8,
     width: windowWidth - 30,
-    gap: 16,
+    gap: 8,
+  },
+  imagesContainer: {
+    position: 'relative',
+  },
+  imageSliderContainer: {
+    width: windowWidth - 30,
+    borderTopLeftRadius: 8,
+    borderTopRightRadius: 8,
+    overflow: 'hidden',
+  },
+  image: {
+    height: 450,
+    width: windowWidth - 30,
+  },
+  dotsContainer: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 6,
+    position: 'absolute',
+    bottom: 16,
+    width: '100%',
+  },
+  dotInactive: {
+    width: 8,
+    height: 8,
+    borderRadius: 999,
+    backgroundColor: '#d1d5db',
+  },
+  dotActive: {
+    width: 16,
+    height: 8,
+    borderRadius: 999,
+    backgroundColor: '#8B4513',
+  },
+  content: {
+    paddingRight: 16,
+    paddingBottom: 8,
+    paddingLeft: 16,
+  },
+  petName: {
+    fontSize: 20,
+    fontWeight: '800',
+    color: '#8B4513',
+  },
+  titleRow: {
+    display: 'flex',
+    flexDirection: 'row',
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    gap: 4,
+  },
+  brownBoldText: {
+    fontWeight: '800',
+    color: '#8B4513',
+  },
+  ratingRow: {
+    display: 'flex',
+    flexDirection: 'row',
+    gap: 2,
+  },
+  description: {
+    fontSize: 16,
+    marginTop: 8,
+  },
+  detailsRow: {
+    display: 'flex',
+    flexDirection: 'row',
+    width: '100%',
+    justifyContent: 'space-between',
+    marginTop: 8,
   },
   button: {
     display: 'flex',
@@ -104,7 +246,11 @@ const stylesModal = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#8B4513',
     padding: 4,
-    marginVertical: 4,
+    marginVertical: 8,
     backgroundColor: '#8B4513',
+  },
+  buttonText: {
+    fontWeight: '800',
+    color: '#ffffff',
   },
 })

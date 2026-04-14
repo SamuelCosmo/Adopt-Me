@@ -2,9 +2,9 @@ import { StyleSheet, View, Text, SafeAreaView, FlatList, Dimensions, Pressable }
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import Svg, { Path } from 'react-native-svg'
 import { StarEmptyIcon, StarFilledIcon } from '@/assets/svg/stars'
-import { useState } from 'react'
-import { useSelector } from 'react-redux'
-import { PetsProps } from '@/utils/interfaces'
+import { useCallback, useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { AdoptionProps } from '@/utils/interfaces'
 import PetCard from '@/components/PetCard'
 import ModalPets from '@/components/ModalPets'
 import { GridIcon, ListIcon } from '@/assets/svg/gridList'
@@ -12,57 +12,40 @@ import CommentCard from '@/components/CommentCard'
 import { ScrollView } from 'react-native-gesture-handler'
 import AddButton from '@/components/AddButton'
 import { useRouter } from 'expo-router'
+import { AppDispatch } from '@/store/StoreContext'
+import { fetchAdoptionsByUserId, selectUserAdoptions } from '@/store/slices/adoptionSlice'
 
-const catImage = require('../assets/images/cat.jpg')
-const dogImage = require('../assets/images/dog.webp')
-
-const data: PetsProps[] = [
-  {
-    id: '1',
-    srcImage: dogImage,
-    owner: 'Samuel Gutierrez',
-    score: 2,
-    name: 'Cerberus, protector del abismo',
-    description:
-      'Cerberus es un feroz cachorro de tres cabezas que custodia la entrada del abismo, impidiendo que las almas escapen. Aunque pequeño, su instinto protector y mirada ardiente reflejan el poder que algún día desatará. 🔥🐶',
-    age: 2,
-    city: 'Mexicali',
-    state: 'B.C.',
-  },
-  {
-    id: '2',
-    srcImage: catImage,
-    owner: 'Ernesto Lopez',
-    score: 5,
-    name: 'Tomás, el devorador de dioses',
-    description:
-      'Es una criatura envuelta en misterio. Bajo su suave pelaje y mirada inocente se esconde un hambre cósmica insaciable. Con un bostezo, consume deidades; con un zarpazo, desgarra realidades. 🐱✨',
-    age: 2,
-    city: 'Mexicali',
-    state: 'B.C.',
-  },
-]
-
-const defaultPet: PetsProps = {
-  id: '0',
-  owner: '',
-  score: 0,
-  srcImage: '',
-  name: '',
+const defaultPet: AdoptionProps = {
+  id: 0,
+  user_id: 0,
+  species_id: 0,
+  breed_id: null,
+  title: '',
+  pet_name: '',
   description: '',
-  age: 0,
+  address: '',
   city: '',
   state: '',
+  zip_code: '',
+  age: 0,
+  size: 'small',
+  gender: 'unknown',
+  images: [],
+  status: 'active',
+  created_at: '',
+  updated_at: '',
+  deleted_at: null,
 }
 
 interface FirstRouteProps {
   setOpenModal: (value: boolean) => void
-  setPetToShow: (value: PetsProps) => void
+  setPetToShow: (value: AdoptionProps) => void
+  adoptions: AdoptionProps[]
 }
 
 const windowWidth = Dimensions.get('window').width
 
-const FirstRoute = ({ setOpenModal, setPetToShow }: FirstRouteProps) => {
+const FirstRoute = ({ setOpenModal, setPetToShow, adoptions }: FirstRouteProps) => {
   const [gridList, setGridList] = useState(false)
 
   return (
@@ -80,10 +63,10 @@ const FirstRoute = ({ setOpenModal, setPetToShow }: FirstRouteProps) => {
       </Pressable>
 
       <FlatList
-        data={data}
-        keyExtractor={(item) => item.id}
+        data={adoptions}
+        keyExtractor={(item) => item.id.toString()}
         numColumns={gridList ? 2 : 1}
-        key={gridList ? 'grid' : 'list'} // ← Aquí se fuerza el reinicio del FlatList
+        key={gridList ? 'grid' : 'list'}
         renderItem={({ item }) => (
           <View
             style={{
@@ -134,11 +117,21 @@ const SecondRoute = () => (
 )
 
 export default function Profile() {
+  const dispatch = useDispatch<AppDispatch>()
   const [openModal, setOpenModal] = useState(false)
   const [petToShow, setPetToShow] = useState(defaultPet)
   const [tab, setTab] = useState<'pets' | 'comments'>('pets')
   const router = useRouter()
+  const userId = useSelector((state: any) => state.auth.user.id)
   const userName = useSelector((state: any) => state.auth.user.name)
+  const adoptions = useSelector(selectUserAdoptions)
+  const canEditSelectedPet = Boolean(userId) && petToShow.user_id === Number(userId)
+
+  useEffect(() => {
+    if (userId) {
+      dispatch(fetchAdoptionsByUserId(userId))
+    }
+  }, [dispatch, userId])
 
   return (
     <SafeAreaProvider>
@@ -146,7 +139,12 @@ export default function Profile() {
         <View style={{ flex: 1, width: '100%' }}>
           {tab === 'comments' && <AddButton onClick={() => router.push('/publish_comment')} />}
 
-          <ModalPets openModal={openModal} setOpenModal={setOpenModal} petToShow={petToShow} />
+          <ModalPets
+            openModal={openModal}
+            setOpenModal={setOpenModal}
+            petToShow={petToShow}
+            enableEdit={canEditSelectedPet}
+          />
 
           {/* Header */}
           <View style={styles.headerContainer}>
@@ -192,7 +190,9 @@ export default function Profile() {
               </Pressable>
             </View>
 
-            {tab === 'pets' && <FirstRoute setOpenModal={setOpenModal} setPetToShow={setPetToShow} />}
+            {tab === 'pets' && (
+              <FirstRoute setOpenModal={setOpenModal} setPetToShow={setPetToShow} adoptions={adoptions} />
+            )}
             {tab === 'comments' && <SecondRoute />}
           </View>
         </View>

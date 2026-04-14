@@ -11,10 +11,11 @@ interface AuthState {
 }
 
 const initialState: AuthState = {
-  user: { name: '', email: '', password: '', token: '' },
+  user: { id: 0, name: '', email: '', password: '', token: '' },
 }
 
 interface StoredSession {
+  id: number
   name: string
   email: string
   token: string
@@ -37,7 +38,7 @@ export const restoreSession = createAsyncThunk('auth/restoreSession', async (_, 
     const session = JSON.parse(rawSession) as Partial<StoredSession>
     if (!session.token) return null
 
-    dispatch(signIn({ name: session.name || '', email: session.email || '', password: '', token: session.token }))
+    dispatch(signIn({ id: session.id || 0, name: session.name || '', email: session.email || '', password: '', token: session.token }))
     dispatch(setOpenModalSignIn(false))
     return session
   } catch (error: any) {
@@ -89,8 +90,8 @@ export const loginUser = createAsyncThunk(
 
       const data = await res.json()
       if (res.status === 200) {
-        await storeSession({ name: data.user.name, email: data.user.email, token: data.token })
-        dispatch(signIn({ name: data.user.name, email: data.user.email, password: '', token: data.token }))
+        await storeSession({ id: data.user.id || 0, name: data.user.name, email: data.user.email, token: data.token })
+        dispatch(signIn({ id: data.user.id || 0, name: data.user.name, email: data.user.email, password: '', token: data.token }))
         dispatch(setOpenModalSignIn(false))
         alert('Login Successful.')
         return data
@@ -155,7 +156,7 @@ const authSlice = createSlice({
       state.user = action.payload
     },
     signOut: (state) => {
-      state.user = { name: '', password: '', email: '', token: '' }
+      state.user = { id: 0, name: '', password: '', email: '', token: '' }
     },
   },
 })

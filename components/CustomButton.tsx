@@ -44,14 +44,29 @@ interface CustomButtonProps {
   title: string
   onPress: () => void
   isLoading?: boolean
-  setIsLoading?: (loading: boolean) => void
   customStyles?: object
 }
 
-export default function CustomButton({ title, onPress, styles = 'button', isLoading = false, setIsLoading, customStyles = {} }: CustomButtonProps) {
+export default function CustomButton({
+  title,
+  onPress,
+  styles = 'button',
+  isLoading = false,
+  customStyles = {},
+}: CustomButtonProps) {
   return (
-    <Pressable style={[stylesModal[styles], customStyles]} onPress={onPress}>
-      {isLoading ? <LoadingSvg /> : <Text style={styles === 'button' ? stylesModal.button_text : stylesModal.cancel_text}>{title}</Text>}
+    <Pressable
+      style={[stylesModal[styles], customStyles]}
+      onPress={() => {
+        if (!isLoading) onPress()
+      }}
+      disabled={isLoading}
+    >
+      {isLoading ? (
+        <LoadingSvg />
+      ) : (
+        <Text style={styles === 'button' ? stylesModal.button_text : stylesModal.cancel_text}>{title}</Text>
+      )}
     </Pressable>
   )
 }
