@@ -42,7 +42,7 @@ export default function HomeScreen() {
 
   const router = useRouter()
   const dispatch = useDispatch<AppDispatch>()
-  const token = useSelector((state: any) => state.auth.user.token)
+  const token = useSelector((state: any) => state.auth.token)
   const openModalSignIn = useSelector((state: any) => {
     return state.modalSignIn.openModalSignIn
   })

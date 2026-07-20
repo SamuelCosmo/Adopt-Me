@@ -1,4 +1,4 @@
-import { StyleSheet, View, Text, SafeAreaView, FlatList, Dimensions, Pressable } from 'react-native'
+import { StyleSheet, View, Text, SafeAreaView, FlatList, Dimensions, Pressable, Image } from 'react-native'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import Svg, { Path } from 'react-native-svg'
 import { StarEmptyIcon, StarFilledIcon } from '@/assets/svg/stars'
@@ -14,6 +14,7 @@ import AddButton from '@/components/AddButton'
 import { useRouter } from 'expo-router'
 import { AppDispatch } from '@/store/StoreContext'
 import { fetchAdoptionsByUserId, selectUserAdoptions } from '@/store/slices/adoptionSlice'
+import ProfileImageModal from '@/components/ProfileImageModal'
 
 const defaultPet: AdoptionProps = {
   id: 0,
@@ -122,10 +123,12 @@ export default function Profile() {
   const [petToShow, setPetToShow] = useState(defaultPet)
   const [tab, setTab] = useState<'pets' | 'comments'>('pets')
   const router = useRouter()
-  const userId = useSelector((state: any) => state.auth.user.id)
-  const userName = useSelector((state: any) => state.auth.user.name)
+  const userId = useSelector((state: any) => state.user.user.id)
+  const userName = useSelector((state: any) => state.user.user.name)
+  const userProfileImage = useSelector((state: any) => state.user.user.profile_image)
   const adoptions = useSelector(selectUserAdoptions)
   const canEditSelectedPet = Boolean(userId) && petToShow.user_id === Number(userId)
+  const [openImageModal, setOpenImageModal] = useState(false)
 
   useEffect(() => {
     if (userId) {
@@ -148,17 +151,23 @@ export default function Profile() {
 
           {/* Header */}
           <View style={styles.headerContainer}>
-            <View style={styles.profileIcon}>
-              <Svg width={56} height={56} viewBox='0 0 24 24' fill='none'>
-                <Path
-                  d='M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z'
-                  stroke='#7c7c7c'
-                  strokeWidth={2}
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                />
-              </Svg>
-            </View>
+            <Pressable onPress={() => setOpenImageModal(true)}>
+              <View style={styles.profileIcon}>
+                {userProfileImage ? (
+                  <Image source={{ uri: userProfileImage }} style={{ width: 56, height: 56, borderRadius: 28 }} />
+                ) : (
+                  <Svg width={56} height={56} viewBox='0 0 24 24' fill='none'>
+                    <Path
+                      d='M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z'
+                      stroke='#7c7c7c'
+                      strokeWidth={2}
+                      strokeLinecap='round'
+                      strokeLinejoin='round'
+                    />
+                  </Svg>
+                )}
+              </View>
+            </Pressable>
 
             <Text style={styles.name}>{userName}</Text>
 
@@ -197,6 +206,12 @@ export default function Profile() {
           </View>
         </View>
       </SafeAreaView>
+
+      <ProfileImageModal
+        visible={openImageModal}
+        onClose={() => setOpenImageModal(false)}
+        userProfileImage={userProfileImage}
+      />
     </SafeAreaProvider>
   )
 }

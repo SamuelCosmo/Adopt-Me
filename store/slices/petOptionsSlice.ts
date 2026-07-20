@@ -24,7 +24,7 @@ export const fetchPetOptions = createAsyncThunk<
   { state: RootState; rejectValue: string }
 >('petOptions/fetchPetOptions', async (_, { getState, rejectWithValue }) => {
   try {
-    const token = getState().auth.user.token
+    const token = getState().auth.token
 
     const headers = {
       'Content-Type': 'application/json',

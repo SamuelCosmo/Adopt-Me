@@ -56,7 +56,7 @@ export default function PublishPet() {
   const [form, setForm] = useState({ ...defaultForm })
   const dispatch = useDispatch<AppDispatch>()
   const router = useRouter()
-  const token = useSelector((state: RootState) => state.auth.user.token)
+  const token = useSelector((state: RootState) => state.auth.token)
   const speciesOptions = useSelector(selectSpeciesOptions)
   const breedOptions = useSelector(selectBreedOptions)
   const loadingPetOptions = useSelector(selectPetOptionsLoading)

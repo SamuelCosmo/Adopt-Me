@@ -157,7 +157,7 @@ function CatSvg() {
 
 function SignInButton() {
   const dispatch = useDispatch()
-  const token = useSelector((state: any) => state.auth.user.token)
+  const token = useSelector((state: any) => state.auth.token)
   const [showMenu, setShowMenu] = useState(false)
   const [isSignIn, setIsSignIn] = useState(!!token)
 

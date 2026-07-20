@@ -23,7 +23,7 @@ export const fetchAdoptions = createAsyncThunk<AdoptionProps[], void, { state: R
 	'adoption/fetchAdoptions',
 	async (_, { getState, rejectWithValue }) => {
 		try {
-			const token = getState().auth.user.token
+			const token = getState().auth.token
 
 			const res = await fetch(`${EXPO_PUBLIC_API_URL}/adoption`, {
 				method: 'GET',
@@ -54,7 +54,7 @@ export const fetchAdoptionsByUserId = createAsyncThunk<
 	{ state: RootState; rejectValue: string }
 >('adoption/fetchAdoptionsByUserId', async (userId, { getState, rejectWithValue }) => {
 	try {
-		const token = getState().auth.user.token
+		const token = getState().auth.token
 
 		const res = await fetch(`${EXPO_PUBLIC_API_URL}/adoption/user/${userId}`, {
 			method: 'GET',
@@ -82,7 +82,7 @@ export const createAdoption = createAsyncThunk<AdoptionProps, FormData, { state:
 	'adoption/createAdoption',
 	async (formData, { getState, rejectWithValue }) => {
 		try {
-			const token = getState().auth.user.token
+			const token = getState().auth.token
 
 			const res = await fetch(`${EXPO_PUBLIC_API_URL}/adoption`, {
 				method: 'POST',
@@ -113,7 +113,7 @@ export const updateAdoption = createAsyncThunk<
 	{ state: RootState; rejectValue: string }
 >('adoption/updateAdoption', async ({ id, formData }, { getState, rejectWithValue }) => {
 	try {
-		const token = getState().auth.user.token
+		const token = getState().auth.token
 
 		const res = await fetch(`${EXPO_PUBLIC_API_URL}/adoption/${id}`, {
 			method: 'PATCH',
